@@ -48,6 +48,7 @@ public:
 
     bool sendMessage(const QString &message);
     bool startSingleServer();
+    bool stopSingleServer();
     bool isRunning() const;
 
 private slots:
@@ -56,6 +57,8 @@ private slots:
 private:
     QString serverName() const;
     QLocalServer *m_localServer;
+
+    QString suffix;
 
 };
 

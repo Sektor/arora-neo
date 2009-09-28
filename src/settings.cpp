@@ -75,6 +75,10 @@
 #include <qmetaobject.h>
 #include <qsettings.h>
 
+#include <QSoftMenuBar>
+#include <QMenu>
+#include <QDir>
+
 SettingsDialog::SettingsDialog(QWidget *parent)
     : QDialog(parent)
 {
@@ -84,6 +88,21 @@ SettingsDialog::SettingsDialog(QWidget *parent)
     connect(cookiesButton, SIGNAL(clicked()), this, SLOT(showCookies()));
     connect(standardFontButton, SIGNAL(clicked()), this, SLOT(chooseFont()));
     connect(fixedFontButton, SIGNAL(clicked()), this, SLOT(chooseFixedFont()));
+
+    loadDefaults();
+    loadFromSettings();
+
+    this->buttonBox->setVisible(false); //
+    QMenu *softMenuBar = QSoftMenuBar::menuFor(this);
+    softMenuBar->addAction(tr("OK"), this, SLOT(accept()));
+    softMenuBar->addSeparator();
+    softMenuBar->addAction(tr("Reset"), this, SLOT(resetSettings()));
+}
+
+void SettingsDialog::resetSettings()
+{
+    QSettings settings;
+    settings.clear();
 
     loadDefaults();
     loadFromSettings();
@@ -102,7 +121,8 @@ void SettingsDialog::loadDefaults()
     fixedFont = QFont(fixedFontFamily, fixedFontSize);
     fixedLabel->setText(QString(QLatin1String("%1 %2")).arg(fixedFont.family()).arg(fixedFont.pointSize()));
 
-    downloadsLocation->setText(QDesktopServices::storageLocation(QDesktopServices::DesktopLocation));
+    //downloadsLocation->setText(QDesktopServices::storageLocation(QDesktopServices::DesktopLocation));
+    downloadsLocation->setText(QDir::homePath());
 
     enableJavascript->setChecked(defaultSettings->testAttribute(QWebSettings::JavascriptEnabled));
     enablePlugins->setChecked(defaultSettings->testAttribute(QWebSettings::PluginsEnabled));
@@ -115,7 +135,8 @@ void SettingsDialog::loadFromSettings()
     settings.beginGroup(QLatin1String("MainWindow"));
     QString defaultHome = QLatin1String("http://www.arora-browser.org");
     homeLineEdit->setText(settings.value(QLatin1String("home"), defaultHome).toString());
-    startupBehavior->setCurrentIndex(settings.value(QLatin1String("startupBehavior"), 0).toInt());
+    //startupBehavior->setCurrentIndex(settings.value(QLatin1String("startupBehavior"), 0).toInt());
+    startupBehavior->setCurrentIndex(settings.value(QLatin1String("startupBehavior"), 1).toInt());
     settings.endGroup();
 
     settings.beginGroup(QLatin1String("history"));
@@ -335,12 +356,14 @@ void SettingsDialog::accept()
 void SettingsDialog::showCookies()
 {
     CookiesDialog *dialog = new CookiesDialog(BrowserApplication::cookieJar(), this);
+    dialog->setWindowState(Qt::WindowMaximized); //
     dialog->exec();
 }
 
 void SettingsDialog::showExceptions()
 {
     CookiesExceptionsDialog *dialog = new CookiesExceptionsDialog(BrowserApplication::cookieJar(), this);
+    dialog->setWindowState(Qt::WindowMaximized); //
     dialog->exec();
 }
 
@@ -372,3 +395,15 @@ void SettingsDialog::setHomeToCurrentPage()
         homeLineEdit->setText(webView->url().toString());
 }
 
+bool SettingsDialog::event(QEvent *event)
+{
+    if(event->type() == QEvent::WindowDeactivate)
+    {
+        lower();
+    }
+    else if(event->type() == QEvent::WindowActivate)
+    {
+        raise();
+    }
+    return QWidget::event(event);
+}

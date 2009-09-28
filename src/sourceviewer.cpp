@@ -46,7 +46,7 @@ SourceViewer::SourceViewer(const QString &source,
     , m_findAction(new QAction(tr("&Find"), m_editMenu))
 {
     setWindowTitle(QString(tr("Source of Page ")).append(title));
-    resize(640, 480);
+    //resize(640, 480); //
 
     m_source = new QString(source);
 

@@ -33,6 +33,8 @@
 #include <qtextstream.h>
 #include <qfile.h>
 
+#include <QTime>
+
 #ifndef Q_OS_WIN
 #include <unistd.h>
 #endif
@@ -40,7 +42,9 @@
 SingleApplication::SingleApplication(int &argc, char **argv)
     : QtopiaApplication(argc, argv)
     , m_localServer(0)
+//    , suffix("")
 {
+    suffix = "_" + QTime::currentTime().toString("hh.mm.ss.zzz");
 }
 
 bool SingleApplication::sendMessage(const QString &message)
@@ -90,6 +94,16 @@ bool SingleApplication::startSingleServer()
     return success;
 }
 
+bool SingleApplication::stopSingleServer()
+{
+    if (!m_localServer)
+        return false;
+
+    m_localServer->close();
+    delete m_localServer;
+    return true;
+}
+
 bool SingleApplication::isRunning() const
 {
     return (0 != m_localServer);
@@ -120,6 +134,7 @@ QString SingleApplication::serverName() const
 #else
     // How do you get the current user on windows?
 #endif
+    serverName += suffix;
     return serverName;
 }
 

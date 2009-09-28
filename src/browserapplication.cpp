@@ -81,12 +81,9 @@
 #include <qsettings.h>
 #include <qwebsettings.h>
 
+#include <QtopiaApplication>
+
 #include <qdebug.h>
-
-
-#define GITCHANGENUMBER 0
-#define GITVERSION      0
-
 
 DownloadManager *BrowserApplication::s_downloadManager = 0;
 HistoryManager *BrowserApplication::s_historyManager = 0;
@@ -97,14 +94,15 @@ LanguageManager *BrowserApplication::s_languageManager = 0;
 BrowserApplication::BrowserApplication(int &argc, char **argv)
     : SingleApplication(argc, argv)
     , quiting(false)
+    , suspendDisabled(false)
 {
     QtopiaApplication::setOrganizationDomain(QLatin1String("arora-browser.org"));
     QtopiaApplication::setApplicationName(QLatin1String("Arora"));
     QString version = QLatin1String("0.4");
-    if (QLatin1String(GITCHANGENUMBER) != QLatin1String("0"))
-        version += QString(tr(" (Change: %1 %2)"))
-                    .arg(QLatin1String(GITCHANGENUMBER))
-                    .arg(QLatin1String(GITVERSION));
+//    if (QLatin1String(GITCHANGENUMBER) != QLatin1String("0"))
+//        version += QString(tr(" (Change: %1 %2)"))
+//                    .arg(QLatin1String(GITCHANGENUMBER))
+//                    .arg(QLatin1String(GITVERSION));
 
     QtopiaApplication::setApplicationVersion(version);
 #ifndef AUTOTESTS
@@ -149,11 +147,18 @@ BrowserApplication::BrowserApplication(int &argc, char **argv)
 #ifndef AUTOTESTS
     QTimer::singleShot(0, this, SLOT(postLaunch()));
 #endif
+
+    QtopiaApplication::setPowerConstraint(QtopiaApplication::DisableSuspend); //prevent suspending
+    suspendDisabled = true;
 }
 
 BrowserApplication::~BrowserApplication()
 {
+    if (suspendDisabled)
+        QtopiaApplication::setPowerConstraint(QtopiaApplication::Enable); //restore power saving settings
+
     quiting = true;
+    stopSingleServer();
     delete s_downloadManager;
     qDeleteAll(m_mainWindows);
     delete s_networkAccessManager;
@@ -236,7 +241,7 @@ void BrowserApplication::postLaunch()
     if (m_mainWindows.count() > 0) {
         QSettings settings;
         settings.beginGroup(QLatin1String("MainWindow"));
-        int startup = settings.value(QLatin1String("startupBehavior")).toInt();
+        int startup = settings.value(QLatin1String("startupBehavior"), 1).toInt(); //
         QStringList args = QtopiaApplication::arguments();
 
         if (args.count() > 1) {
@@ -440,7 +445,9 @@ BrowserMainWindow *BrowserApplication::newMainWindow()
 {
     BrowserMainWindow *browser = new BrowserMainWindow();
     m_mainWindows.prepend(browser);
-    browser->show();
+    setMainWidget(browser); //
+    showMainWidget();
+//    browser->show();
     return browser;
 }
 
@@ -460,7 +467,10 @@ CookieJar *BrowserApplication::cookieJar()
 DownloadManager *BrowserApplication::downloadManager()
 {
     if (!s_downloadManager)
+    {
         s_downloadManager = new DownloadManager();
+        s_downloadManager->setWindowState(Qt::WindowMaximized); //
+    }
     return s_downloadManager;
 }
 

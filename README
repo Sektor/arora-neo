@@ -1,5 +1,2 @@
-Arora web browser
-
-http://www.arora-browser.org
-
-Arora is a cross platform web browser built using Qt and WebKit.
+Port of Arora 0.4 web browser for Qt Extended.
+http://github.com/Sektor/arora-neo

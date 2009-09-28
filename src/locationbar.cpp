@@ -166,14 +166,15 @@ void LocationBar::paintEvent(QPaintEvent *event)
     // paint the progressbar
     if (m_webView && !hasFocus()) {
         int progress = m_webView->progress();
-        QColor loadingColor = QColor(116, 192, 250);
-        if (p.brush(QPalette::Text) != Qt::black)
-            loadingColor = m_defaultBaseColor.value() < 128 ? m_defaultBaseColor.lighter(200) : m_defaultBaseColor.darker(200);
+//        QColor loadingColor = QColor(116, 192, 250);
+        QColor loadingColor = QColor(0,125,0);
+//        if (p.brush(QPalette::Text) != Qt::black)
+//            loadingColor = m_defaultBaseColor.value() < 128 ? m_defaultBaseColor.lighter(200) : m_defaultBaseColor.darker(200);
 
         painter.setBrush(generateGradient(m_defaultBaseColor, loadingColor, height()));
         painter.setPen(Qt::transparent);
 
-        int mid = backgroundRect.width() / 100 * progress;
+        int mid = backgroundRect.width() * progress / 100;
         QRect progressRect = QRect(backgroundRect.x(), backgroundRect.y(), mid, backgroundRect.height());
         painter.drawRect(progressRect);
     }

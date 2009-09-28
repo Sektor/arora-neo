@@ -107,7 +107,8 @@ public slots:
 protected:
     void closeEvent(QCloseEvent *event);
     void mousePressEvent(QMouseEvent *event);
-    void changeEvent(QEvent *event);
+    void changeEvent(QEvent *event);    
+    bool event(QEvent *event); //
 
 private slots:
     void save();
@@ -135,8 +136,11 @@ private slots:
     void slotViewMenuBar();
     void slotViewToolbar();
     void slotViewBookmarksBar();
+    void slotViewSearchBar(); //
     void slotViewStatusbar();
     void slotViewPageSource();
+    void slotFingerScrolling(bool en); //
+    void slotMobileUserAgent(bool en); //
     void slotViewFullScreen(bool enable);
 
     void slotWebSearch();
@@ -157,6 +161,7 @@ private slots:
     void geometryChangeRequested(const QRect &geometry);
     void updateToolbarActionText(bool visible);
     void updateBookmarksToolbarActionText(bool visible);
+    void updateSearchToolbarActionText(bool visible);
 
 private:
     void retranslate();
@@ -166,6 +171,7 @@ private:
     void updateStatusbarActionText(bool visible);
 
 private:
+    QMenu *softMenuBar;
     QToolBar *m_navigationBar;
 //    QSplitter *m_navigationSplitter;
     ToolbarSearch *m_toolbarSearch;
@@ -189,9 +195,13 @@ private:
     QAction *m_stopReload;
     QAction *m_viewToolbar;
     QAction *m_viewBookmarkBar;
+    QAction *m_viewSearchBar;
     QAction *m_viewStatusbar;
     QAction *m_restoreLastSession;
     QAction *m_addBookmark;
+    QAction *m_fullScreen;
+    QAction *m_finger; //
+    QAction *m_mobile; //
 
     QIcon m_reloadIcon;
     QIcon m_stopIcon;

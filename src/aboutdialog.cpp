@@ -32,7 +32,8 @@ AboutDialog::AboutDialog(QWidget *parent)
 {
     setupUi(this);
     setWindowTitle(tr("About") + QLatin1String(" ") + qApp->applicationName());
-    logo->setPixmap(qApp->windowIcon().pixmap(128, 128));
+//    logo->setPixmap(qApp->windowIcon().pixmap(128, 128));
+    logo->setVisible(false);
     name->setText(qApp->applicationName());
     version->setText(QApplication::applicationVersion());
     connect(authorsButton, SIGNAL(clicked()),
@@ -46,7 +47,7 @@ void AboutDialog::displayFile(const QString &fileName, const QString &title)
     QDialog *dialog = new QDialog(this);
     QLayout *layout = new QVBoxLayout(dialog);
     QTextEdit *textEdit = new QTextEdit(dialog);
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Close, Qt::Horizontal, dialog);
+    //QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Close, Qt::Horizontal, dialog);
 
     textEdit->setLayoutDirection(Qt::LeftToRight);
 
@@ -58,16 +59,17 @@ void AboutDialog::displayFile(const QString &fileName, const QString &title)
     }
 
     textEdit->setReadOnly(true);
-    connect(buttonBox, SIGNAL(rejected()), dialog, SLOT(close()));
-    buttonBox->setCenterButtons(true);
+    //connect(buttonBox, SIGNAL(rejected()), dialog, SLOT(close()));
+    //buttonBox->setCenterButtons(true);
     layout->addWidget(textEdit);
-    layout->addWidget(buttonBox);
+    //layout->addWidget(buttonBox);
     layout->setMargin(6);
 
     dialog->setLayout(layout);
     dialog->setWindowTitle(title);
     dialog->setWindowFlags(Qt::Sheet);
-    dialog->resize(600, 350);
+    //dialog->resize(600, 350);
+    dialog->setWindowState(Qt::WindowMaximized); //
     dialog->exec();
 }
 
@@ -81,3 +83,15 @@ void AboutDialog::licenseButtonClicked()
     displayFile(QLatin1String(":LICENSE.GPL2"), tr("License"));
 }
 
+bool AboutDialog::event(QEvent *event)
+{
+    if(event->type() == QEvent::WindowDeactivate)
+    {
+        lower();
+    }
+    else if(event->type() == QEvent::WindowActivate)
+    {
+        raise();
+    }
+    return QWidget::event(event);
+}

@@ -41,6 +41,9 @@ private slots:
 private:
     void displayFile(const QString &fileName, const QString &title);
 
+protected:
+    bool event(QEvent *event);
+
 };
 
 #endif // ABOUTDIALOG_H

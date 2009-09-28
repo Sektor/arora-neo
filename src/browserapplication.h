@@ -130,6 +130,8 @@ private:
     QList<QPointer<BrowserMainWindow> > m_mainWindows;
     QByteArray m_lastSession;
     bool quiting;
+
+    bool suspendDisabled;
 };
 
 #endif // BROWSERAPPLICATION_H

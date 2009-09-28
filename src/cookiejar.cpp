@@ -81,6 +81,8 @@
 #include <qwebsettings.h>
 
 #include <QtopiaApplication>
+#include <QSoftMenuBar>
+#include <QMenu>
 
 #include <qdebug.h>
 
@@ -738,6 +740,10 @@ CookiesExceptionsDialog::CookiesExceptionsDialog(CookieJar *cookieJar, QWidget *
         header += buffer;
         exceptionTable->horizontalHeader()->resizeSection(i, header);
     }
+
+    this->buttonBox->setVisible(false); //
+    QMenu *softMenuBar = QSoftMenuBar::menuFor(this);
+    softMenuBar->addAction(tr("OK"), this, SLOT(accept()));
 }
 
 void CookiesExceptionsDialog::textChanged(const QString &text)

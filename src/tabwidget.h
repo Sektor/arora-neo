@@ -138,7 +138,12 @@ public:
     QByteArray saveState() const;
     bool restoreState(const QByteArray &state);
 
-#if QT_VERSION < 0x040500
+    QStackedWidget *m_lineEdits;
+
+    void setGlobalFingerScrolling(bool en);
+    void setGlobalMobileUserAgent(bool en);
+
+#if QT_VER_DEFINE < 0x040500
 protected:
 //    void contextMenuEvent(QContextMenuEvent *event);
     void mouseDoubleClickEvent(QMouseEvent *event);
@@ -176,6 +181,7 @@ private slots:
     void statusBarVisibilityChangeRequestedCheck(bool visible);
     void toolBarVisibilityChangeRequestedCheck(bool visible);
     void historyCleared();
+    void completerItemActivated(const QString &s); //
 
 private:
     QLabel *animationLabel(int index, bool addMovie);
@@ -192,8 +198,10 @@ private:
     QList<WebActionMapper*> m_actions;
 
     QCompleter *m_lineEditCompleter;
-    QStackedWidget *m_lineEdits;
     TabBar *m_tabBar;
+
+    bool globalFingerScrolling;
+    bool globalMobileUserAgent;
 };
 
 #endif // TABWIDGET_H

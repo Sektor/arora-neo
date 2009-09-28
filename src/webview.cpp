@@ -82,6 +82,8 @@
 
 #include <qwebframe.h>
 
+#include <QDesktopWidget>
+
 #include <qdebug.h>
 
 WebPage::WebPage(QObject *parent)
@@ -89,10 +91,26 @@ WebPage::WebPage(QObject *parent)
     , m_keyboardModifiers(Qt::NoModifier)
     , m_pressedButtons(Qt::NoButton)
     , m_openInNewTab(false)
+    , mobileUserAgent(false)
 {
     setNetworkAccessManager(BrowserApplication::networkAccessManager());
     connect(this, SIGNAL(unsupportedContent(QNetworkReply *)),
             this, SLOT(handleUnsupportedContent(QNetworkReply *)));
+}
+
+void WebPage::setMobileUserAgent(bool en)
+{
+    mobileUserAgent = en;
+}
+
+QString WebPage::userAgentForUrl(const QUrl& url) const
+{
+    if (mobileUserAgent)
+    {
+        return "Mozilla/5.0 (iPhone; U; CPU like Mac OS X; en) "
+               "AppleWebKit/420+ (KHTML, like Gecko) Version/3.0 Mobile/1A538b Safari/419.3";
+    }
+    return QWebPage::userAgentForUrl(url);
 }
 
 BrowserMainWindow *WebPage::mainWindow()
@@ -162,7 +180,6 @@ QWebPage *WebPage::createWindow(QWebPage::WebWindowType type)
 }
 
 #if !defined(QT_NO_UITOOLS)
-/*
 QObject *WebPage::createPlugin(const QString &classId, const QUrl &url, const QStringList &paramNames, const QStringList &paramValues)
 {
     Q_UNUSED(url);
@@ -171,7 +188,6 @@ QObject *WebPage::createPlugin(const QString &classId, const QUrl &url, const QS
     QUiLoader loader;
     return loader.createWidget(classId, view());
 }
-*/
 #endif // !defined(QT_NO_UITOOLS)
 
 void WebPage::handleUnsupportedContent(QNetworkReply *reply)
@@ -231,8 +247,9 @@ void WebPage::handleUnsupportedContent(QNetworkReply *reply)
 WebView::WebView(QWidget *parent)
     : QWebView(parent)
     , m_progress(0)
-    , m_currentZoom(100)
+    , m_currentZoom(133) //100
     , m_page(new WebPage(this))
+    , fingerScrolling(true)
 {
     setPage(m_page);
     connect(page(), SIGNAL(statusBarMessage(const QString&)),
@@ -248,10 +265,38 @@ WebView::WebView(QWidget *parent)
     page()->setForwardUnsupportedContent(true);
     setAcceptDrops(true);
 
+    target = 0;
+    filterPress = false;
+    pressed = false;
+    moveThreshold = QApplication::desktop()->screenGeometry().width()/40;
+
+    QtopiaApplication::setInputMethodHint(this,QtopiaApplication::Text);
+
+    QPalette p = palette();
+    p.setColor(QPalette::Base, QColor(255, 255, 255, 255));
+    p.setColor(QPalette::Background, QColor(255, 255, 255, 255));
+    setPalette(p);
+    setAttribute(Qt::WA_OpaquePaintEvent, false); //
+
+    //setStyleSheet("* { background-color:rgb(255,255,255); color:rgb(0,0,0)}");
+
+    /*
+    QPalette pal = palette();
+    pal.setBrush(QPalette::Background, Qt::white);
+    pal.setBrush(QPalette::Base, QColor(255,255,255,255));
+    pal.setBrush(QPalette::Foreground, Qt::black);
+    pal.setBrush(QPalette::Text, Qt::black);
+    pal.setBrush(QPalette::Button, QColor(220,220,220));
+    setPalette(pal);
+    setAttribute(Qt::WA_OpaquePaintEvent, false);
+    */
+
     // the zoom values (in percent) are chosen to be like in Mozilla Firefox 3
     m_zoomLevels << 30 << 50 << 67 << 80 << 90;
     m_zoomLevels << 100;
     m_zoomLevels << 110 << 120 << 133 << 150 << 170 << 200 << 240 << 300;
+
+    setTextSizeMultiplier(qreal(m_currentZoom) / 100.0);
 }
 /*
 void WebView::contextMenuEvent(QContextMenuEvent *event)
@@ -465,13 +510,14 @@ QUrl WebView::url() const
     return m_initialUrl;
 }
 
+/*
 void WebView::mousePressEvent(QMouseEvent *event)
 {
     m_page->m_pressedButtons = event->buttons();
     m_page->m_keyboardModifiers = event->modifiers();
     QWebView::mousePressEvent(event);
 }
-/*
+
 void WebView::dragEnterEvent(QDragEnterEvent *event)
 {
     event->acceptProposedAction();
@@ -507,7 +553,7 @@ void WebView::dropEvent(QDropEvent *event)
         }
     }
 }
-*/
+
 void WebView::mouseReleaseEvent(QMouseEvent *event)
 {
     QWebView::mouseReleaseEvent(event);
@@ -518,6 +564,7 @@ void WebView::mouseReleaseEvent(QMouseEvent *event)
         }
     }
 }
+*/
 
 void WebView::setStatusBarText(const QString &string)
 {
@@ -529,3 +576,145 @@ void WebView::downloadRequested(const QNetworkRequest &request)
     BrowserApplication::downloadManager()->download(request);
 }
 
+//===============================================================================
+
+void WebView::setFingerScrolling(bool en)
+{
+    fingerScrolling = en;
+    if (!en)
+    {
+        ptimer.stop();
+    }
+}
+
+void WebView::timerEvent(QTimerEvent *ev)
+{
+    if (!fingerScrolling) return;
+
+    if (ev->timerId() == ptimer.timerId()) {
+        ptimer.stop();
+        QApplication::postEvent(target, new QMouseEvent(QEvent::MouseButtonPress, target->mapFromGlobal(mousePos), mousePos, Qt::LeftButton, buttons, QApplication::keyboardModifiers()));
+        if (!pressed)
+            QApplication::postEvent(target, new QMouseEvent(QEvent::MouseButtonRelease, target->mapFromGlobal(mousePos), mousePos, Qt::LeftButton, buttons, QApplication::keyboardModifiers()));
+    } else if (ev->timerId() == vcursorfade.timerId()) {
+        QRect r(vcursorpos,vcursorpm.size());
+        r.translate(-vcursorhotspot);
+        vcursorfade.stop();
+        update(r);
+    }
+}
+
+void WebView::mousePressEvent(QMouseEvent* ev)
+{
+    if (!fingerScrolling)
+    {
+        QWebView::mousePressEvent(ev);
+        return;
+    }
+
+    if (!ev->spontaneous()) {
+        QWebView::mousePressEvent(ev);
+        //updateSoftMenuBar();
+        return;
+    }
+    if (ev->button() == Qt::LeftButton) {
+        target = this;
+        mousePos = ev->globalPos();
+        buttons = ev->buttons();
+        filterPress = false;
+        ptimer.start(250, this);
+        pressed = true;
+        return;
+    } else {
+        target = 0;
+        filterPress = false;
+    }
+
+    QWebView::mousePressEvent(ev);
+    //updateSoftMenuBar();
+}
+
+void WebView::mouseMoveEvent(QMouseEvent* ev)
+{
+    if (!fingerScrolling)
+    {
+        QWebView::mouseMoveEvent(ev);
+        return;
+    }
+
+    if (!ev->spontaneous()) {
+        //QWebView::mouseMoveEvent(ev);
+        return;
+    }
+    if (pressed) {
+        QPoint diff = mousePos - ev->globalPos();
+        if (!filterPress
+            && (qAbs(diff.y()) > moveThreshold
+            || qAbs(diff.x()) > moveThreshold)) {
+            filterPress = true;
+            if (!ptimer.isActive()) {
+                // TODO: unpress buttons, etc
+                // QThumbStyle uses bogus move to get e.g. QPushButtons unpressed.
+                // but can cause selection to happen in webkit
+            }
+            ptimer.stop();
+            diff = QPoint(0,0); // avoid jump
+        }
+        if (filterPress) {
+            int maxh = page()->mainFrame()->scrollBarMaximum(Qt::Horizontal);
+            int maxv = page()->mainFrame()->scrollBarMaximum(Qt::Vertical);
+            if (diff.y() && maxv > 0) {
+                int moveY = diff.y();
+                page()->mainFrame()->setScrollBarValue(Qt::Vertical, page()->mainFrame()->scrollBarValue(Qt::Vertical) + moveY);
+            }
+
+            if (diff.x() && maxh > 0) {
+                int moveX = diff.x();
+                page()->mainFrame()->setScrollBarValue(Qt::Horizontal, page()->mainFrame()->scrollBarValue(Qt::Horizontal) + moveX);
+            }
+
+            mousePos = ev->globalPos();
+            return;
+        }
+        if (ptimer.isActive())
+            return;
+    }
+
+    QWebView::mouseMoveEvent(ev);
+}
+
+void WebView::mouseReleaseEvent(QMouseEvent* ev)
+{
+    if (!fingerScrolling)
+    {
+        QWebView::mouseReleaseEvent(ev);
+        return;
+    }
+
+    if (!ev->spontaneous()) {
+        QWebView::mouseReleaseEvent(ev);
+        //updateSoftMenuBar();
+        return;
+    }
+    if (ev->button() == Qt::LeftButton) {
+        pressed = false;
+        if (target) {
+            //scrollArea = 0;
+            if (filterPress) {
+                // Don't send any release
+                target = 0;
+                ptimer.stop();
+                ev->accept();
+                filterPress = false;
+                return;
+            }
+            if (ptimer.isActive()) {
+                ptimer.start(0, this);
+                return;
+            }
+        }
+    }
+
+    QWebView::mouseReleaseEvent(ev);
+    //updateSoftMenuBar();
+}

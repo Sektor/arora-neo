@@ -86,9 +86,15 @@ private slots:
     void chooseFont();
     void chooseFixedFont();
 
+    void resetSettings();
+
 private:
     QFont standardFont;
     QFont fixedFont;
+
+protected:
+    bool event(QEvent *event);
+
 };
 
 #endif // SETTINGS_H

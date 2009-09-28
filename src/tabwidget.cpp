@@ -83,6 +83,8 @@
 #include <qstyle.h>
 #include <qtoolbutton.h>
 
+#include <QPalette>
+
 #include <qdebug.h>
 
 TabWidget::TabWidget(QWidget *parent)
@@ -96,7 +98,10 @@ TabWidget::TabWidget(QWidget *parent)
     , m_lineEditCompleter(0)
     , m_lineEdits(0)
     , m_tabBar(new TabBar(this))
+    , globalFingerScrolling(true)
+    , globalMobileUserAgent(false)
 {
+    m_tabBar->setFixedHeight(50); // + see tabSizeHint in tabbar.cpp
     setElideMode(Qt::ElideRight);
 
     new QShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_T), this, SLOT(openLastTab()));
@@ -109,11 +114,11 @@ TabWidget::TabWidget(QWidget *parent)
     connect(m_tabBar, SIGNAL(closeOtherTabs(int)), this, SLOT(closeOtherTabs(int)));
     connect(m_tabBar, SIGNAL(reloadTab(int)), this, SLOT(reloadTab(int)));
     connect(m_tabBar, SIGNAL(reloadAllTabs()), this, SLOT(reloadAllTabs()));
-#if QT_VERSION < 0x040500
+#if QT_VER_DEFINE < 0x040500
     connect(m_tabBar, SIGNAL(tabMoveRequested(int, int)), this, SLOT(moveTab(int, int)));
 #endif
     setTabBar(m_tabBar);
-#if QT_VERSION >= 0x040500
+#if QT_VER_DEFINE >= 0x040500
     setDocumentMode(true);
     connect(m_tabBar, SIGNAL(tabMoved(int, int)),
             this, SLOT(moveTab(int, int)));
@@ -128,11 +133,19 @@ TabWidget::TabWidget(QWidget *parent)
     m_closeTabAction->setShortcuts(QKeySequence::Close);
     connect(m_closeTabAction, SIGNAL(triggered()), this, SLOT(closeTab()));
 
-#if QT_VERSION < 0x040500
-    m_newTabAction->setIcon(QIcon(QLatin1String(":addtab.png")));
+#if QT_VER_DEFINE < 0x040500
+    QPixmap pm;
+
+    pm.load(":addtab.png");
+    pm = pm.scaled(36,36);
+    //m_newTabAction->setIcon(QIcon(QLatin1String(":addtab.png")));
+    m_newTabAction->setIcon(QIcon(pm));
     m_newTabAction->setIconVisibleInMenu(false);
 
-    m_closeTabAction->setIcon(QIcon(QLatin1String(":closetab.png")));
+    pm.load(":closetab.png");
+    pm = pm.scaled(36,36);
+    //m_closeTabAction->setIcon(QIcon(QLatin1String(":closetab.png")));
+    m_closeTabAction->setIcon(QIcon(pm));
     m_closeTabAction->setIconVisibleInMenu(false);
 #endif
 
@@ -165,12 +178,13 @@ TabWidget::TabWidget(QWidget *parent)
     m_recentlyClosedTabsAction->setMenu(m_recentlyClosedTabsMenu);
     m_recentlyClosedTabsAction->setEnabled(false);
 
-#if QT_VERSION >= 0x040500
+#if QT_VER_DEFINE >= 0x040500
     m_tabBar->setTabsClosable(true);
     connect(m_tabBar, SIGNAL(tabCloseRequested(int)),
             this, SLOT(closeTab(int)));
     m_tabBar->setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);
 #else
+/*
     // corner buttons
     QToolButton *addTabButton = new QToolButton(this);
     addTabButton->setDefaultAction(m_newTabAction);
@@ -183,12 +197,14 @@ TabWidget::TabWidget(QWidget *parent)
     closeTabButton->setAutoRaise(true);
     closeTabButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
     setCornerWidget(closeTabButton, Qt::TopRightCorner);
+*/
 #endif
 
     connect(this, SIGNAL(currentChanged(int)),
             this, SLOT(currentChanged(int)));
 
-    m_lineEdits = new QStackedWidget(this);
+//    m_lineEdits = new QStackedWidget(this);
+    m_lineEdits = new QStackedWidget(parent);
 
     connect(BrowserApplication::historyManager(), SIGNAL(historyCleared()),
         this, SLOT(historyCleared()));
@@ -228,7 +244,7 @@ void TabWidget::reloadTab(int index)
 
 void TabWidget::moveTab(int fromIndex, int toIndex)
 {
-#if QT_VERSION < 0x040500
+#if QT_VER_DEFINE < 0x040500
     disconnect(this, SIGNAL(currentChanged(int)),
                this, SLOT(currentChanged(int)));
 
@@ -414,6 +430,11 @@ BrowserMainWindow *TabWidget::mainWindow()
     return 0;
 }
 
+void TabWidget::completerItemActivated(const QString &s) //
+{
+    emit loadPage(s);
+}
+
 WebView *TabWidget::makeNewTab(bool makeCurrent)
 {
     if (!makeCurrent) {
@@ -428,6 +449,7 @@ WebView *TabWidget::makeNewTab(bool makeCurrent)
         HistoryCompletionModel *completionModel = new HistoryCompletionModel(this);
         completionModel->setSourceModel(BrowserApplication::historyManager()->historyFilterModel());
         m_lineEditCompleter = new QCompleter(completionModel, this);
+        connect(m_lineEditCompleter, SIGNAL(activated(const QString &)), this, SLOT(completerItemActivated(const QString &))); //
         // Should this be in Qt by default?
         QAbstractItemView *popup = m_lineEditCompleter->popup();
         QListView *listView = qobject_cast<QListView*>(popup);
@@ -453,7 +475,8 @@ WebView *TabWidget::makeNewTab(bool makeCurrent)
         emptyWidget->setAutoFillBackground(true);
         disconnect(this, SIGNAL(currentChanged(int)),
                    this, SLOT(currentChanged(int)));
-        addTab(emptyWidget, tr("Untitled"));
+//        addTab(emptyWidget, tr("Untitled"));
+        addTab(emptyWidget,"");
         connect(this, SIGNAL(currentChanged(int)),
                 this, SLOT(currentChanged(int)));
         return 0;
@@ -461,6 +484,9 @@ WebView *TabWidget::makeNewTab(bool makeCurrent)
 
     // webview
     WebView *webView = new WebView;
+    webView->setFingerScrolling(globalFingerScrolling);
+    webView->webPage()->setMobileUserAgent(globalMobileUserAgent);
+
     locationBar->setWebView(webView);
     connect(webView, SIGNAL(loadStarted()),
             this, SLOT(webViewLoadStarted()));
@@ -486,7 +512,8 @@ WebView *TabWidget::makeNewTab(bool makeCurrent)
             this, SLOT(toolBarVisibilityChangeRequestedCheck(bool)));
 
     WebViewWithSearch *webViewWithSearch = new WebViewWithSearch(webView, this);
-    addTab(webViewWithSearch, tr("Untitled"));
+//    addTab(webViewWithSearch, tr("Untitled"));
+    addTab(webViewWithSearch,"");
     if (makeCurrent)
         setCurrentWidget(webViewWithSearch);
 
@@ -627,7 +654,7 @@ void TabWidget::closeTab(int index)
 
 QLabel *TabWidget::animationLabel(int index, bool addMovie)
 {
-#if QT_VERSION < 0x040500
+#if QT_VER_DEFINE < 0x040500
     Q_UNUSED(index);
     Q_UNUSED(addMovie);
     return 0;
@@ -655,20 +682,23 @@ void TabWidget::webViewLoadStarted()
     WebView *webView = qobject_cast<WebView*>(sender());
     int index = webViewIndex(webView);
     if (-1 != index) {
-#if QT_VERSION >= 0x040500
+#if QT_VER_DEFINE >= 0x040500
         QLabel *label = animationLabel(index, true);
         if (label->movie())
             label->movie()->start();
 #else
-        QIcon icon(QLatin1String(":loading.gif"));
-        setTabIcon(index, icon);
+        //QIcon icon(QLatin1String(":loading.gif"));
+        //setTabIcon(index, icon);
+
+        QPixmap pm(":loading.gif");
+        setTabIcon(index, QIcon(pm.scaled(36,36)));
 #endif
     }
 }
 
 void TabWidget::webViewLoadFinished()
 {
-#if QT_VERSION >= 0x040500
+#if QT_VER_DEFINE >= 0x040500
     WebView *webView = qobject_cast<WebView*>(sender());
     int index = webViewIndex(webView);
     if (-1 != index) {
@@ -690,7 +720,7 @@ void TabWidget::webViewIconChanged()
     WebView *webView = qobject_cast<WebView*>(sender());
     int index = webViewIndex(webView);
     if (-1 != index) {
-#if QT_VERSION >= 0x040500
+#if QT_VER_DEFINE >= 0x040500
 #if !defined(Q_WS_MAC)
         QIcon icon = BrowserApplication::instance()->icon(webView->url());
         QLabel *label = animationLabel(index, false);
@@ -700,8 +730,12 @@ void TabWidget::webViewIconChanged()
         label->setPixmap(icon.pixmap(16, 16));
 #endif
 #else
-        QIcon icon = BrowserApplication::instance()->icon(webView->url());
-        setTabIcon(index, icon);
+        //QIcon icon = BrowserApplication::instance()->icon(webView->url());
+        //setTabIcon(index, icon);
+
+        QPixmap *pm = new QPixmap( BrowserApplication::instance()->icon(webView->url()).pixmap(16,16) );
+        setTabIcon(index, QIcon(pm->scaled(36,36)));
+        delete pm;
 #endif
     }
 }
@@ -715,7 +749,7 @@ void TabWidget::webViewTitleChanged(const QString &title)
         if (title.isEmpty())
             tabTitle = webView->url().toString();
         tabTitle.replace(QLatin1Char('&'), QLatin1String("&&"));
-        setTabText(index, tabTitle);
+//        setTabText(index, tabTitle);
     }
     if (currentIndex() == index)
         emit setCurrentTitle(title);
@@ -760,7 +794,7 @@ void TabWidget::aboutToShowRecentTriggeredAction(QAction *action)
     loadUrl(url, NewTab);
 }
 
-#if QT_VERSION < 0x040500
+#if QT_VER_DEFINE < 0x040500
 /*
 void TabWidget::contextMenuEvent(QContextMenuEvent *event)
 {
@@ -887,3 +921,20 @@ bool TabWidget::restoreState(const QByteArray &state)
     return true;
 }
 
+void TabWidget::setGlobalFingerScrolling(bool en)
+{
+    globalFingerScrolling = en;
+    for (int i=0; i<this->count(); i++)
+    {
+        this->webView(i)->setFingerScrolling(en);
+    }
+}
+
+void TabWidget::setGlobalMobileUserAgent(bool en)
+{
+    globalMobileUserAgent = en;
+    for (int i=0; i<this->count(); i++)
+    {
+        this->webView(i)->webPage()->setMobileUserAgent(en);
+    }
+}

@@ -667,7 +667,7 @@ void HistoryMenu::showHistoryDialog()
     HistoryDialog *dialog = new HistoryDialog(this);
     connect(dialog, SIGNAL(openUrl(const QUrl&)),
             this, SIGNAL(openUrl(const QUrl&)));
-    dialog->show();
+    dialog->showMaximized(); //
 }
 
 void HistoryMenu::clearHistoryDialog()

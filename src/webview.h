@@ -65,6 +65,7 @@
 #define WEBVIEW_H
 
 #include <qwebview.h>
+#include <QTimer>
 
 QT_BEGIN_NAMESPACE
 class QAuthenticator;
@@ -85,12 +86,14 @@ signals:
 public:
     WebPage(QObject *parent = 0);
     BrowserMainWindow *mainWindow();
+    void setMobileUserAgent(bool en); //
 
 protected:
+    QString userAgentForUrl(const QUrl& url) const; //
     bool acceptNavigationRequest(QWebFrame *frame, const QNetworkRequest &request, NavigationType type);
     QWebPage *createWindow(QWebPage::WebWindowType type);
 #if !defined(QT_NO_UITOOLS)
-//    QObject *createPlugin(const QString &classId, const QUrl &url, const QStringList &paramNames, const QStringList &paramValues);
+    QObject *createPlugin(const QString &classId, const QUrl &url, const QStringList &paramNames, const QStringList &paramValues);
 #endif
 
 private slots:
@@ -104,6 +107,8 @@ private:
     Qt::MouseButtons m_pressedButtons;
     bool m_openInNewTab;
     QUrl m_loadingUrl;
+
+    bool mobileUserAgent; //
 };
 
 class WebView : public QWebView
@@ -121,14 +126,18 @@ public:
     QString lastStatusBarText() const;
     inline int progress() const { return m_progress; }
 
+    void setFingerScrolling(bool en);
+
 public slots:
     void zoomIn();
     void zoomOut();
     void resetZoom();
 
 protected:
-    void mousePressEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
+    void mousePressEvent(QMouseEvent *ev);
+    void mouseReleaseEvent(QMouseEvent *ev);
+    void mouseMoveEvent(QMouseEvent *ev);
+
 //    void contextMenuEvent(QContextMenuEvent *event);
     void wheelEvent(QWheelEvent *event);
     void resizeEvent(QResizeEvent *event);
@@ -159,6 +168,24 @@ private:
     int m_currentZoom;
     QList<int> m_zoomLevels;
     WebPage *m_page;
+
+
+    bool fingerScrolling;
+
+    QPoint vcursorpos;
+    QPoint vcursorhotspot;
+    QPixmap vcursorpm;
+    QPixmap vcursorpm_faded;
+    QBasicTimer vcursorfade;
+
+    QPoint mousePos;
+    Qt::MouseButtons buttons;
+    QWidget *target;
+    bool filterPress;
+    bool pressed;
+    int moveThreshold;
+    QBasicTimer ptimer;
+    void timerEvent(QTimerEvent*);
 };
 
 #endif

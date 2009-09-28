@@ -86,7 +86,8 @@ int TabShortcut::tab()
 TabBar::TabBar(QWidget *parent)
     : QTabBar(parent)
     , m_viewTabBarAction(0)
-    , m_showTabBarWhenOneTab(true)
+//    , m_showTabBarWhenOneTab(true)
+    , m_showTabBarWhenOneTab(false)
 {
     setContextMenuPolicy(Qt::CustomContextMenu);
     setAcceptDrops(true); //
@@ -106,7 +107,7 @@ TabBar::TabBar(QWidget *parent)
     updateViewToolBarAction();
     connect(m_viewTabBarAction, SIGNAL(triggered()),
             this, SLOT(viewTabBar()));
-#if QT_VERSION >= 0x040500
+#if QT_VER_DEFINE >= 0x040500
     setMovable(true);
 #endif
 }
@@ -127,7 +128,7 @@ QAction *TabBar::viewTabBarAction() const
     return m_viewTabBarAction;
 }
 
-#if QT_VERSION >= 0x040500
+#if QT_VER_DEFINE >= 0x040500
 QTabBar::ButtonPosition TabBar::freeSide()
 {
     QTabBar::ButtonPosition side = (QTabBar::ButtonPosition)style()->styleHint(QStyle::SH_TabBar_CloseButtonPosition, 0, this);
@@ -249,12 +250,12 @@ void TabBar::mousePressEvent(QMouseEvent *event)
 void TabBar::mouseMoveEvent(QMouseEvent *event)
 {
     if (event->buttons() == Qt::LeftButton) {
-#if QT_VERSION >= 0x040500
+#if QT_VER_DEFINE >= 0x040500
         int diffX = event->pos().x() - m_dragStartPos.x();
         int diffY = event->pos().y() - m_dragStartPos.y();
 #endif
         if ((event->pos() - m_dragStartPos).manhattanLength() > QApplication::startDragDistance()
-#if QT_VERSION >= 0x040500
+#if QT_VER_DEFINE >= 0x040500
             && diffX < 3 && diffX > -3
             && diffY < -10
 #endif
@@ -275,7 +276,7 @@ void TabBar::mouseMoveEvent(QMouseEvent *event)
     QTabBar::mouseMoveEvent(event);
 }
 
-#if QT_VERSION < 0x040500
+#if QT_VER_DEFINE < 0x040500
 /*
 void TabBar::dragEnterEvent(QDragEnterEvent *event)
 {
@@ -305,7 +306,8 @@ QSize TabBar::tabSizeHint(int index) const
 {
     QSize sizeHint = QTabBar::tabSizeHint(index);
     QFontMetrics fm = fontMetrics();
-    return sizeHint.boundedTo(QSize(fm.width(QLatin1Char('M')) * 18, sizeHint.height()));
+    //return sizeHint.boundedTo(QSize(fm.width(QLatin1Char('M')) * 18, sizeHint.height()));
+    return sizeHint.boundedTo(QSize(fm.width(QLatin1Char('M')) * 18, 50));
 }
 
 void TabBar::reloadTab()

@@ -219,7 +219,7 @@ void SearchLineEdit::paintEvent(QPaintEvent *event)
         QStyleOptionFrameV2 panel;
         initStyleOption(&panel);
         QRect textRect = style()->subElementRect(QStyle::SE_LineEditContents, &panel, this);
-#if QT_VERSION >= 0x040500
+#if QT_VER_DEFINE >= 0x040500
         int left = textMargin(LineEdit::LeftSide);
         int right = textMargin(LineEdit::RightSide);
         textRect.adjust(left, 0, -right, 0);

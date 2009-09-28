@@ -5,32 +5,45 @@ CONFIG += qtopia
 QT += webkit network
 
 #DEFINES += QT_NO_CAST_FROM_ASCII
+DEFINES += QT_NO_UITOOLS
+DEFINES += GITVERSION=0
+DEFINES += GITCHANGENUMBER=0
+DEFINES += QT_VER_DEFINE=0
+#QT_VERSION
 
 #-----------------------------------------------
 
-INCLUDEPATH += utils
+pkg [
+    name=arora
+    desc="Cross Platform WebKit Browser"
+    license=GPL
+    version=0.4
+    maintainer="Anton Olkhovik <ant007h@gmail.com>"
+]
 
-RESOURCES += data/data.qrc \
+desktop [
+    hint=desktop
+    files=arora.desktop
+    path=/apps/Applications
+]
+
+pics [
+    hint=pics
+    files=data/arora.svg
+    path=/pics/arora
+]
+
+#-----------------------------------------------
+
+INCLUDEPATH += \
+    utils
+
+RESOURCES += \
+    data/data.qrc \
     htmls/htmls.qrc
 
 #-----------------------------------------------
 SOURCES += main.cpp
-#-----------------------------------------------
-
-HEADERS += \
-    utils/autosaver.h \
-    utils/lineedit.h \
-    utils/lineedit_p.h \
-    utils/proxystyle.h \
-    utils/singleapplication.h \
-    utils/squeezelabel.h
-
-SOURCES += \
-    utils/autosaver.cpp \
-    utils/lineedit.cpp \
-    utils/singleapplication.cpp \
-    utils/squeezelabel.cpp
-
 #-----------------------------------------------
 
 FORMS += \
@@ -105,5 +118,21 @@ SOURCES += \
     webview.cpp \
     webviewsearch.cpp \
     xbel.cpp
+
+#-----------------------------------------------
+
+HEADERS += \
+    utils/autosaver.h \
+    utils/lineedit.h \
+    utils/lineedit_p.h \
+    utils/proxystyle.h \
+    utils/singleapplication.h \
+    utils/squeezelabel.h
+
+SOURCES += \
+    utils/autosaver.cpp \
+    utils/lineedit.cpp \
+    utils/singleapplication.cpp \
+    utils/squeezelabel.cpp
 
 #-----------------------------------------------
