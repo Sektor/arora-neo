@@ -64,7 +64,7 @@
 #include "autosaver.h"
 
 #include <qcompleter.h>
-#include <qcoreapplication.h>
+#include <QtopiaApplication>
 #include <qmenu.h>
 #include <qsettings.h>
 #include <qstringlistmodel.h>
@@ -139,7 +139,7 @@ void ToolbarSearch::searchNow()
     url.addQueryItem(QLatin1String("q"), searchText);
     url.addQueryItem(QLatin1String("ie"), QLatin1String("UTF-8"));
     url.addQueryItem(QLatin1String("oe"), QLatin1String("UTF-8"));
-    url.addQueryItem(QLatin1String("client"), QCoreApplication::applicationName());
+    url.addQueryItem(QLatin1String("client"), QtopiaApplication::applicationName());
     emit search(url);
 }
 

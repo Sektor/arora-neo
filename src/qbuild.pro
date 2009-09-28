@@ -4,7 +4,7 @@ TARGET = arora
 CONFIG += qtopia
 QT += webkit network
 
-DEFINES += QT_NO_CAST_FROM_ASCII
+#DEFINES += QT_NO_CAST_FROM_ASCII
 
 #-----------------------------------------------
 

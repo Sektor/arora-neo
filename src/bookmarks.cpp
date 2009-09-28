@@ -294,7 +294,7 @@ void BookmarksManager::importBookmarks()
 void BookmarksManager::exportBookmarks()
 {
 //    QString fileName = QFileDialog::getSaveFileName(0, tr("Save File"),
-//                                tr("%1 Bookmarks.xbel").arg(QCoreApplication::applicationName()),
+//                                tr("%1 Bookmarks.xbel").arg(QtopiaApplication::applicationName()),
 //                                tr("XBEL (*.xbel *.xml)"));
     QString fileName;
     if (fileName.isEmpty())

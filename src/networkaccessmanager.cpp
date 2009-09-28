@@ -207,7 +207,7 @@ void NetworkAccessManager::sslErrors(QNetworkReply *reply, const QList<QSslError
     }
 
     QString errors = errorStrings.join(QLatin1String("\n"));
-    int ret = QMessageBox::warning(mainWindow, QCoreApplication::applicationName(),
+    int ret = QMessageBox::warning(mainWindow, QtopiaApplication::applicationName(),
                            tr("SSL Errors:\n\n%1\n\n%2\n\n"
                               "Do you want to ignore these errors?").arg(reply->url().toString()).arg(errors),
                            QMessageBox::Yes | QMessageBox::No,
@@ -215,7 +215,7 @@ void NetworkAccessManager::sslErrors(QNetworkReply *reply, const QList<QSslError
 
     if (ret == QMessageBox::Yes) {
         if (ca_new.count() > 0) {
-            ret = QMessageBox::question(mainWindow, QCoreApplication::applicationName(),
+            ret = QMessageBox::question(mainWindow, QtopiaApplication::applicationName(),
                 tr("Do you want to accept all these certificates?"),
                 QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
             if (ret == QMessageBox::Yes) {

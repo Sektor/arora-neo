@@ -343,7 +343,7 @@ void HistoryManager::save()
 
     QString directory = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
     if (directory.isEmpty())
-        directory = QDir::homePath() + QLatin1String("/.") + QCoreApplication::applicationName();
+        directory = QDir::homePath() + QLatin1String("/.") + QtopiaApplication::applicationName();
     if (!QFile::exists(directory)) {
         QDir dir;
         dir.mkpath(directory);

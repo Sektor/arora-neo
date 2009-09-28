@@ -63,7 +63,7 @@
 #include "autosaver.h"
 
 #include <qdir.h>
-#include <qcoreapplication.h>
+#include <QtopiaApplication>
 #include <qmetaobject.h>
 
 #include <qdebug.h>

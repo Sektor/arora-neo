@@ -38,7 +38,7 @@
 #endif
 
 SingleApplication::SingleApplication(int &argc, char **argv)
-    : QApplication(argc, argv)
+    : QtopiaApplication(argc, argv)
     , m_localServer(0)
 {
 }
@@ -110,7 +110,7 @@ void SingleApplication::newConnection()
 
 QString SingleApplication::serverName() const
 {
-    QString serverName = QCoreApplication::applicationName();
+    QString serverName = QtopiaApplication::applicationName();
     Q_ASSERT(!serverName.isEmpty());
 #ifdef Q_WS_QWS
     serverName += QLatin1String("_qws");

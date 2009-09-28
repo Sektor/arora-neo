@@ -98,17 +98,17 @@ BrowserApplication::BrowserApplication(int &argc, char **argv)
     : SingleApplication(argc, argv)
     , quiting(false)
 {
-    QCoreApplication::setOrganizationDomain(QLatin1String("arora-browser.org"));
-    QCoreApplication::setApplicationName(QLatin1String("Arora"));
+    QtopiaApplication::setOrganizationDomain(QLatin1String("arora-browser.org"));
+    QtopiaApplication::setApplicationName(QLatin1String("Arora"));
     QString version = QLatin1String("0.4");
     if (QLatin1String(GITCHANGENUMBER) != QLatin1String("0"))
         version += QString(tr(" (Change: %1 %2)"))
                     .arg(QLatin1String(GITCHANGENUMBER))
                     .arg(QLatin1String(GITVERSION));
 
-    QCoreApplication::setApplicationVersion(version);
+    QtopiaApplication::setApplicationVersion(version);
 #ifndef AUTOTESTS
-    QStringList args = QCoreApplication::arguments();
+    QStringList args = QtopiaApplication::arguments();
     QString message = (args.count() > 1) ? args.last() : QString();
     if (sendMessage(args.last()))
         return;
@@ -172,7 +172,7 @@ void BrowserApplication::lastWindowClosed()
 
 BrowserApplication *BrowserApplication::instance()
 {
-    return (static_cast<BrowserApplication *>(QCoreApplication::instance()));
+    return (static_cast<BrowserApplication *>(QtopiaApplication::instance()));
 }
 
 void BrowserApplication::messageRecieved(const QString &message)
@@ -225,7 +225,7 @@ void BrowserApplication::postLaunch()
 {
     QString directory = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
     if (directory.isEmpty())
-        directory = QDir::homePath() + QLatin1String("/.") + QCoreApplication::applicationName();
+        directory = QDir::homePath() + QLatin1String("/.") + QtopiaApplication::applicationName();
     QWebSettings::setIconDatabasePath(directory);
 
     setWindowIcon(QIcon(QLatin1String(":128x128/arora.png")));
@@ -237,7 +237,7 @@ void BrowserApplication::postLaunch()
         QSettings settings;
         settings.beginGroup(QLatin1String("MainWindow"));
         int startup = settings.value(QLatin1String("startupBehavior")).toInt();
-        QStringList args = QCoreApplication::arguments();
+        QStringList args = QtopiaApplication::arguments();
 
         if (args.count() > 1) {
             switch (startup) {

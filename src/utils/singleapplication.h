@@ -29,14 +29,14 @@
 #ifndef SINGALAPPLICATION_H
 #define SINGALAPPLICATION_H
 
-#include <qapplication.h>
+#include <QtopiaApplication>
 
 /*
     QApplication subclass that should be used when you only want one
     instant of the application to exist at a time.
 */
 class QLocalServer;
-class SingleApplication : public QApplication
+class SingleApplication : public QtopiaApplication
 {
     Q_OBJECT
 
