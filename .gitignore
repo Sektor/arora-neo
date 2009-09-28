@@ -1,0 +1,12 @@
+arora
+Arora.app
+Makefile
+.DS_Store
+.ui
+.moc
+.obj
+.rcc
+.qm
+.gdb_history
+*.swp
+
