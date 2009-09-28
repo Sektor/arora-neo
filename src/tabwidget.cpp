@@ -761,6 +761,7 @@ void TabWidget::aboutToShowRecentTriggeredAction(QAction *action)
 }
 
 #if QT_VERSION < 0x040500
+/*
 void TabWidget::contextMenuEvent(QContextMenuEvent *event)
 {
     if (!childAt(event->pos())) {
@@ -769,7 +770,7 @@ void TabWidget::contextMenuEvent(QContextMenuEvent *event)
     }
     QTabWidget::contextMenuEvent(event);
 }
-
+*/
 void TabWidget::mouseDoubleClickEvent(QMouseEvent *event)
 {
     m_tabBar->mouseDoubleClickEvent(event);

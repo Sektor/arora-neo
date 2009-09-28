@@ -74,7 +74,7 @@ class QWebFrame;
 class TabWidget;
 class ToolbarSearch;
 class WebView;
-class QSplitter;
+//class QSplitter;
 class QFrame;
 
 /*!
@@ -167,7 +167,7 @@ private:
 
 private:
     QToolBar *m_navigationBar;
-    QSplitter *m_navigationSplitter;
+//    QSplitter *m_navigationSplitter;
     ToolbarSearch *m_toolbarSearch;
 #if defined(Q_WS_MAC)
     QFrame *m_bookmarksToolbarFrame;

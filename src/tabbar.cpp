@@ -89,7 +89,7 @@ TabBar::TabBar(QWidget *parent)
     , m_showTabBarWhenOneTab(true)
 {
     setContextMenuPolicy(Qt::CustomContextMenu);
-    setAcceptDrops(true);
+    setAcceptDrops(true); //
     setElideMode(Qt::ElideRight);
     setUsesScrollButtons(true);
     connect(this, SIGNAL(customContextMenuRequested(const QPoint &)),
@@ -259,7 +259,7 @@ void TabBar::mouseMoveEvent(QMouseEvent *event)
             && diffY < -10
 #endif
             ) {
-            QDrag *drag = new QDrag(this);
+//            QDrag *drag = new QDrag(this);
             QMimeData *mimeData = new QMimeData;
             QList<QUrl> urls;
             int index = tabAt(event->pos());
@@ -268,14 +268,15 @@ void TabBar::mouseMoveEvent(QMouseEvent *event)
             mimeData->setUrls(urls);
             mimeData->setText(tabText(index));
             mimeData->setData(QLatin1String("action"), "tab-reordering");
-            drag->setMimeData(mimeData);
-            drag->exec();
+//            drag->setMimeData(mimeData);
+//            drag->exec();
         }
     }
     QTabBar::mouseMoveEvent(event);
 }
 
 #if QT_VERSION < 0x040500
+/*
 void TabBar::dragEnterEvent(QDragEnterEvent *event)
 {
     const QMimeData *mimeData = event->mimeData();
@@ -297,6 +298,7 @@ void TabBar::dropEvent(QDropEvent *event)
     }
     QTabBar::dropEvent(event);
 }
+*/
 #endif
 
 QSize TabBar::tabSizeHint(int index) const

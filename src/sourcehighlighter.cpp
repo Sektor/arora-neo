@@ -21,6 +21,28 @@
 #include "qpalette.h"
 
 SourceHighlighter::SourceHighlighter(QTextDocument *document)
+{
+
+}
+
+QTextCharFormat SourceHighlighter::getFormatFor(Construct construct)
+{
+    return formats[construct];
+}
+
+void SourceHighlighter::setFormatFor(Construct construct,
+                         QTextCharFormat &format)
+{
+    formats[construct] = format;
+}
+
+void SourceHighlighter::highlightBlock(const QString &text)
+{
+}
+
+
+/*
+SourceHighlighter::SourceHighlighter(QTextDocument *document)
     : QSyntaxHighlighter(document)
 {
     QPalette palette;
@@ -170,3 +192,4 @@ void SourceHighlighter::highlightBlock(const QString &text)
     }
     setCurrentBlockState(state);
 }
+*/

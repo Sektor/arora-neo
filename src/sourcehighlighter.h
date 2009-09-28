@@ -20,6 +20,39 @@
 #ifndef SOURCEHIGHLIGHTER_H
 #define SOURCEHIGHLIGHTER_H
 
+#include <QTextDocument>
+#include <QTextCharFormat>
+
+class SourceHighlighter
+{
+public:
+    enum Construct {
+        Entity,
+        Tag,
+        Comment,
+        Attribute,
+        LastConstruct = Attribute
+    };
+    SourceHighlighter(QTextDocument *document);
+
+    QTextCharFormat getFormatFor(Construct construct);
+    void setFormatFor(Construct construct, QTextCharFormat &format);
+
+protected:
+    enum State {
+        Normal = -1,
+        InComment,
+        InTag,
+        InAttribute
+    };
+    void highlightBlock(const QString &text);
+
+private:
+    QTextCharFormat formats[LastConstruct + 1];
+};
+
+
+/*
 #include <qsyntaxhighlighter.h>
 
 class SourceHighlighter : public QSyntaxHighlighter
@@ -51,5 +84,6 @@ protected:
 private:
     QTextCharFormat formats[LastConstruct + 1];
 };
+*/
 
 #endif

@@ -271,9 +271,10 @@ BookmarksModel *BookmarksManager::bookmarksModel()
 
 void BookmarksManager::importBookmarks()
 {
-    QString fileName = QFileDialog::getOpenFileName(0, tr("Open File"),
-                                                     QString(),
-                                                     tr("XBEL (*.xbel *.xml)"));
+//    QString fileName = QFileDialog::getOpenFileName(0, tr("Open File"),
+//                                                     QString(),
+//                                                     tr("XBEL (*.xbel *.xml)"));
+    QString fileName;
     if (fileName.isEmpty())
         return;
 
@@ -292,9 +293,10 @@ void BookmarksManager::importBookmarks()
 
 void BookmarksManager::exportBookmarks()
 {
-    QString fileName = QFileDialog::getSaveFileName(0, tr("Save File"),
-                                tr("%1 Bookmarks.xbel").arg(QCoreApplication::applicationName()),
-                                tr("XBEL (*.xbel *.xml)"));
+//    QString fileName = QFileDialog::getSaveFileName(0, tr("Save File"),
+//                                tr("%1 Bookmarks.xbel").arg(QCoreApplication::applicationName()),
+//                                tr("XBEL (*.xbel *.xml)"));
+    QString fileName;
     if (fileName.isEmpty())
         return;
 
@@ -824,7 +826,7 @@ BookmarksDialog::BookmarksDialog(QWidget *parent, BookmarksManager *manager)
     connect(removeButton, SIGNAL(clicked()), tree, SLOT(removeSelected()));
     m_proxyModel->setSourceModel(m_bookmarksModel);
     tree->setModel(m_proxyModel);
-    tree->setDragDropMode(QAbstractItemView::InternalMove);
+//    tree->setDragDropMode(QAbstractItemView::InternalMove);
     tree->setExpanded(m_proxyModel->index(0, 0), true);
     tree->setAlternatingRowColors(true);
     QFontMetrics fm(font());
@@ -969,7 +971,7 @@ BookmarksToolBar::BookmarksToolBar(BookmarksModel *model, QWidget *parent)
     connect(m_bookmarksModel, SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(build()));
     setAcceptDrops(true);
 }
-
+/*
 void BookmarksToolBar::dragEnterEvent(QDragEnterEvent *event)
 {
     const QMimeData *mimeData = event->mimeData();
@@ -1012,7 +1014,7 @@ void BookmarksToolBar::dropEvent(QDropEvent *event)
     }
     QToolBar::dropEvent(event);
 }
-
+*/
 
 void BookmarksToolBar::setRootIndex(const QModelIndex &index)
 {

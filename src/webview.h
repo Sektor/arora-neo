@@ -90,7 +90,7 @@ protected:
     bool acceptNavigationRequest(QWebFrame *frame, const QNetworkRequest &request, NavigationType type);
     QWebPage *createWindow(QWebPage::WebWindowType type);
 #if !defined(QT_NO_UITOOLS)
-    QObject *createPlugin(const QString &classId, const QUrl &url, const QStringList &paramNames, const QStringList &paramValues);
+//    QObject *createPlugin(const QString &classId, const QUrl &url, const QStringList &paramNames, const QStringList &paramValues);
 #endif
 
 private slots:
@@ -129,12 +129,12 @@ public slots:
 protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
-    void contextMenuEvent(QContextMenuEvent *event);
+//    void contextMenuEvent(QContextMenuEvent *event);
     void wheelEvent(QWheelEvent *event);
     void resizeEvent(QResizeEvent *event);
-    void dragEnterEvent(QDragEnterEvent *event);
-    void dragMoveEvent(QDragMoveEvent *event);
-    void dropEvent(QDropEvent *event);
+//    void dragEnterEvent(QDragEnterEvent *event);
+//    void dragMoveEvent(QDragMoveEvent *event);
+//    void dropEvent(QDropEvent *event);
 
 private slots:
     void setProgress(int progress);

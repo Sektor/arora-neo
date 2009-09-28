@@ -147,17 +147,19 @@ void LanguageManager::chooseNewLanguage()
         items << string;
     }
 
-    bool ok;
-    QString item = QInputDialog::getItem(0,
-        tr("Choose language"),
-        tr("<p>You can run with a different language than<br>"
-        "the operating system default.</p>"
-        "<p>Please choose the language which should be used</p>"),
-        items, defaultItem, false, &ok);
+//    bool ok;
+//    QString item = QInputDialog::getItem(0,
+//        tr("Choose language"),
+//        tr("<p>You can run with a different language than<br>"
+//        "the operating system default.</p>"
+//        "<p>Please choose the language which should be used</p>"),
+//        items, defaultItem, false, &ok);
+    bool ok = false;
     if (!ok)
         return;
 
-    int selection = items.indexOf(item);
+//    int selection = items.indexOf(item);
+    int selection = 0;
     if (selection == 0) {
         setCurrentLanguage(QString());
     } else {

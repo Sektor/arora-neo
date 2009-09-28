@@ -102,8 +102,8 @@ protected:
     void mousePressEvent(QMouseEvent* event);
     void mouseMoveEvent(QMouseEvent* event);
 #if QT_VERSION < 0x040500
-    void dragEnterEvent(QDragEnterEvent *event);
-    void dropEvent(QDropEvent *event);
+//    void dragEnterEvent(QDragEnterEvent *event);
+//    void dropEvent(QDropEvent *event);
 #endif
     QSize tabSizeHint(int index) const;
     void tabInserted(int position);

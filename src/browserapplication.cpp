@@ -83,6 +83,11 @@
 
 #include <qdebug.h>
 
+
+#define GITCHANGENUMBER 0
+#define GITVERSION      0
+
+
 DownloadManager *BrowserApplication::s_downloadManager = 0;
 HistoryManager *BrowserApplication::s_historyManager = 0;
 NetworkAccessManager *BrowserApplication::s_networkAccessManager = 0;

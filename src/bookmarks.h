@@ -372,9 +372,9 @@ public:
     void setRootIndex(const QModelIndex &index);
     QModelIndex rootIndex() const;
 
-protected:
-    void dragEnterEvent(QDragEnterEvent *event);
-    void dropEvent(QDropEvent *event);
+//protected:
+//    void dragEnterEvent(QDragEnterEvent *event);
+//    void dropEvent(QDropEvent *event);
 
 private slots:
     void build();

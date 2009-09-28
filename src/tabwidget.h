@@ -140,7 +140,7 @@ public:
 
 #if QT_VERSION < 0x040500
 protected:
-    void contextMenuEvent(QContextMenuEvent *event);
+//    void contextMenuEvent(QContextMenuEvent *event);
     void mouseDoubleClickEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);

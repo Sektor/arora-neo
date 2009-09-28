@@ -162,6 +162,7 @@ QWebPage *WebPage::createWindow(QWebPage::WebWindowType type)
 }
 
 #if !defined(QT_NO_UITOOLS)
+/*
 QObject *WebPage::createPlugin(const QString &classId, const QUrl &url, const QStringList &paramNames, const QStringList &paramValues)
 {
     Q_UNUSED(url);
@@ -170,6 +171,7 @@ QObject *WebPage::createPlugin(const QString &classId, const QUrl &url, const QS
     QUiLoader loader;
     return loader.createWidget(classId, view());
 }
+*/
 #endif // !defined(QT_NO_UITOOLS)
 
 void WebPage::handleUnsupportedContent(QNetworkReply *reply)
@@ -251,7 +253,7 @@ WebView::WebView(QWidget *parent)
     m_zoomLevels << 100;
     m_zoomLevels << 110 << 120 << 133 << 150 << 170 << 200 << 240 << 300;
 }
-
+/*
 void WebView::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu *menu = new QMenu(this);
@@ -300,7 +302,7 @@ void WebView::contextMenuEvent(QContextMenuEvent *event)
 
     QWebView::contextMenuEvent(event);
 }
-
+*/
 void WebView::wheelEvent(QWheelEvent *event)
 {
     if (event->modifiers() & Qt::ControlModifier) {
@@ -469,7 +471,7 @@ void WebView::mousePressEvent(QMouseEvent *event)
     m_page->m_keyboardModifiers = event->modifiers();
     QWebView::mousePressEvent(event);
 }
-
+/*
 void WebView::dragEnterEvent(QDragEnterEvent *event)
 {
     event->acceptProposedAction();
@@ -505,7 +507,7 @@ void WebView::dropEvent(QDropEvent *event)
         }
     }
 }
-
+*/
 void WebView::mouseReleaseEvent(QMouseEvent *event)
 {
     QWebView::mouseReleaseEvent(event);

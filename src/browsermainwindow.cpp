@@ -89,10 +89,10 @@
 #include <qsettings.h>
 #include <qmenubar.h>
 #include <qmessagebox.h>
-#include <qstatusbar.h>
+//#include <qstatusbar.h>
 #include <qtoolbar.h>
 #include <qinputdialog.h>
-#include <qsplitter.h>
+//#include <qsplitter.h>
 
 #include <qurl.h>
 #include <qwebframe.h>
@@ -110,10 +110,10 @@ BrowserMainWindow::BrowserMainWindow(QWidget *parent, Qt::WindowFlags flags)
     , m_reload(0)
 {
     setAttribute(Qt::WA_DeleteOnClose, true);
-    statusBar()->setSizeGripEnabled(true);
+//    statusBar()->setSizeGripEnabled(true);
     // fixes https://bugzilla.mozilla.org/show_bug.cgi?id=219070
     // yes, that's a Firefox bug!
-    statusBar()->setLayoutDirection(Qt::LeftToRight);
+//    statusBar()->setLayoutDirection(Qt::LeftToRight);
     setupMenu();
     setupToolBar();
 
@@ -168,10 +168,10 @@ BrowserMainWindow::BrowserMainWindow(QWidget *parent, Qt::WindowFlags flags)
             this, SLOT(loadPage(const QString &)));
     connect(m_tabWidget, SIGNAL(setCurrentTitle(const QString &)),
             this, SLOT(slotUpdateWindowTitle(const QString &)));
-    connect(m_tabWidget, SIGNAL(showStatusBarMessage(const QString&)),
-            statusBar(), SLOT(showMessage(const QString&)));
-    connect(m_tabWidget, SIGNAL(linkHovered(const QString&)),
-            statusBar(), SLOT(showMessage(const QString&)));
+//    connect(m_tabWidget, SIGNAL(showStatusBarMessage(const QString&)),
+//            statusBar(), SLOT(showMessage(const QString&)));
+//    connect(m_tabWidget, SIGNAL(linkHovered(const QString&)),
+//            statusBar(), SLOT(showMessage(const QString&)));
     connect(m_tabWidget, SIGNAL(loadProgress(int)),
             this, SLOT(slotLoadProgress(int)));
     connect(m_tabWidget, SIGNAL(tabsChanged()),
@@ -182,8 +182,8 @@ BrowserMainWindow::BrowserMainWindow(QWidget *parent, Qt::WindowFlags flags)
             this, SLOT(printRequested(QWebFrame *)));
     connect(m_tabWidget, SIGNAL(menuBarVisibilityChangeRequested(bool)),
             menuBar(), SLOT(setVisible(bool)));
-    connect(m_tabWidget, SIGNAL(statusBarVisibilityChangeRequested(bool)),
-            statusBar(), SLOT(setVisible(bool)));
+//    connect(m_tabWidget, SIGNAL(statusBarVisibilityChangeRequested(bool)),
+//            statusBar(), SLOT(setVisible(bool)));
     connect(m_tabWidget, SIGNAL(toolBarVisibilityChangeRequested(bool)),
             m_navigationBar, SLOT(setVisible(bool)));
     connect(m_tabWidget, SIGNAL(toolBarVisibilityChangeRequested(bool)),
@@ -259,12 +259,12 @@ QByteArray BrowserMainWindow::saveState(bool withTabs) const
     stream << size();
     stream << !m_navigationBar->isHidden();
     stream << !m_bookmarksToolbar->isHidden();
-    stream << !statusBar()->isHidden();
+//    stream << !statusBar()->isHidden();
     if (withTabs)
         stream << tabWidget()->saveState();
     else
         stream << QByteArray();
-    stream << m_navigationSplitter->saveState();
+//    stream << m_navigationSplitter->saveState();
     stream << m_tabWidget->tabBar()->showTabBarWhenOneTab();
 
     stream << qint32(toolBarArea(m_navigationBar));
@@ -300,9 +300,9 @@ bool BrowserMainWindow::restoreState(const QByteArray &state)
     stream >> size;
     stream >> showToolbar;
     stream >> showBookmarksBar;
-    stream >> showStatusbar;
+//    stream >> showStatusbar;
     stream >> tabState;
-    stream >> splitterState;
+//    stream >> splitterState;
     stream >> showTabBarWhenOneTab;
     stream >> navigationBarLocation;
     stream >> bookmarkBarLocation;
@@ -318,10 +318,10 @@ bool BrowserMainWindow::restoreState(const QByteArray &state)
 #endif
     updateBookmarksToolbarActionText(showBookmarksBar);
 
-    statusBar()->setVisible(showStatusbar);
+//    statusBar()->setVisible(showStatusbar);
     updateStatusbarActionText(showStatusbar);
 
-    m_navigationSplitter->restoreState(splitterState);
+//    m_navigationSplitter->restoreState(splitterState);
 
     if (!tabState.isEmpty() && !tabWidget()->restoreState(tabState))
         return false;
@@ -581,21 +581,21 @@ void BrowserMainWindow::setupToolBar()
     m_stopReload->setIcon(m_reloadIcon);
     m_navigationBar->addAction(m_stopReload);
 
-    m_navigationSplitter = new QSplitter(m_navigationBar);
-    m_navigationSplitter->addWidget(m_tabWidget->lineEditStack());
+//    m_navigationSplitter = new QSplitter(m_navigationBar);
+//    m_navigationSplitter->addWidget(m_tabWidget->lineEditStack());
 
     m_toolbarSearch = new ToolbarSearch(m_navigationBar);
-    m_navigationSplitter->addWidget(m_toolbarSearch);
+//    m_navigationSplitter->addWidget(m_toolbarSearch);
     connect(m_toolbarSearch, SIGNAL(search(const QUrl&)),
             m_tabWidget, SLOT(loadUrl(const QUrl&)));
-    m_navigationSplitter->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
+//    m_navigationSplitter->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
     m_tabWidget->lineEditStack()->setMinimumWidth(120);
-    m_navigationSplitter->setCollapsible(0, false);
-    m_navigationBar->addWidget(m_navigationSplitter);
-    int splitterWidth = m_navigationSplitter->width();
-    QList<int> sizes;
-    sizes << (int)((double)splitterWidth * .80) << (int)((double)splitterWidth * .20);
-    m_navigationSplitter->setSizes(sizes);
+//    m_navigationSplitter->setCollapsible(0, false);
+//    m_navigationBar->addWidget(m_navigationSplitter);
+//    int splitterWidth = m_navigationSplitter->width();
+//    QList<int> sizes;
+//    sizes << (int)((double)splitterWidth * .80) << (int)((double)splitterWidth * .20);
+//    m_navigationSplitter->setSizes(sizes);
 }
 
 void BrowserMainWindow::slotShowBookmarksDialog()
@@ -667,6 +667,7 @@ void BrowserMainWindow::updateBookmarksToolbarActionText(bool visible)
 
 void BrowserMainWindow::slotViewStatusbar()
 {
+/*
     if (statusBar()->isVisible()) {
         updateStatusbarActionText(false);
         statusBar()->close();
@@ -674,6 +675,7 @@ void BrowserMainWindow::slotViewStatusbar()
         updateStatusbarActionText(true);
         statusBar()->show();
     }
+*/
     m_autoSaver->changeOccurred();
 }
 
@@ -759,7 +761,7 @@ void BrowserMainWindow::slotPreferences()
 
 void BrowserMainWindow::slotUpdateStatusbar(const QString &string)
 {
-    statusBar()->showMessage(string, 2000);
+//    statusBar()->showMessage(string, 2000);
 }
 
 void BrowserMainWindow::slotUpdateWindowTitle(const QString &title)
@@ -790,8 +792,9 @@ void BrowserMainWindow::slotFileNew()
 
 void BrowserMainWindow::slotFileOpen()
 {
-    QString file = QFileDialog::getOpenFileName(this, tr("Open Web Resource"), QString(),
-                   tr("Web Resources (*.html *.htm *.svg *.png *.gif *.svgz);;All files (*.*)"));
+//    QString file = QFileDialog::getOpenFileName(this, tr("Open Web Resource"), QString(),
+//                   tr("Web Resources (*.html *.htm *.svg *.png *.gif *.svgz);;All files (*.*)"));
+    QString file;
 
     if (file.isEmpty())
         return;

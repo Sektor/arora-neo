@@ -73,8 +73,8 @@
 ClearButton::ClearButton(QWidget *parent)
     : QAbstractButton(parent)
 {
-    setCursor(Qt::ArrowCursor);
-    setToolTip(tr("Clear"));
+//    setCursor(Qt::ArrowCursor);
+//    setToolTip(tr("Clear"));
     setVisible(false);
     setFocusPolicy(Qt::NoFocus);
     setMinimumSize(22, 22);
@@ -128,7 +128,7 @@ SearchButton::SearchButton(QWidget *parent)
     , m_menu(0)
 {
     setObjectName(QLatin1String("SearchButton"));
-    setCursor(Qt::ArrowCursor);
+//    setCursor(Qt::ArrowCursor);
     setFocusPolicy(Qt::NoFocus);
 }
 
