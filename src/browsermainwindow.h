@@ -66,6 +66,7 @@
 #include <qmainwindow.h>
 #include <qicon.h>
 #include <qurl.h>
+#include <QPushButton>
 
 class AutoSaver;
 class BookmarksToolBar;
@@ -99,6 +100,9 @@ public:
     QByteArray saveState(bool withTabs = true) const;
     bool restoreState(const QByteArray &state);
     QAction *showMenuBarAction() const;
+
+    void setAutoRotateState(bool en); //
+    void setLandscapeMode(bool en); //
 
 public slots:
     void loadPage(const QString &url);
@@ -141,6 +145,8 @@ private slots:
     void slotViewPageSource();
     void slotFingerScrolling(bool en); //
     void slotMobileUserAgent(bool en); //
+    void slotAutoRotate(bool en); //
+    void slotToggleToolbar(); //
     void slotViewFullScreen(bool enable);
 
     void slotWebSearch();
@@ -169,6 +175,7 @@ private:
     void setupMenu();
     void setupToolBar();
     void updateStatusbarActionText(bool visible);
+    void setToolbarButtonWidth(QAction *a, int w); //
 
 private:
     QMenu *softMenuBar;
@@ -202,6 +209,11 @@ private:
     QAction *m_fullScreen;
     QAction *m_finger; //
     QAction *m_mobile; //
+    QAction *m_rotate; //
+
+    QAction *m_zoomin; //
+    QAction *m_zoomout; //
+    QPushButton *m_toggleToolbar; //
 
     QIcon m_reloadIcon;
     QIcon m_stopIcon;

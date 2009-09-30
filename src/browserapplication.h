@@ -64,6 +64,7 @@
 #define BROWSERAPPLICATION_H
 
 #include "singleapplication.h"
+#include "rotate.h"
 
 #include <qicon.h>
 #include <qpointer.h>
@@ -101,6 +102,9 @@ public:
     static LanguageManager *languageManager();
     static QString dataDirectory();
 
+    void setAutoRotate(bool en);
+    bool isLandscape();
+
 #if defined(Q_WS_MAC)
     bool event(QEvent *event);
 #endif
@@ -117,6 +121,7 @@ private slots:
     void messageRecieved(const QString &message);
     void postLaunch();
     void openUrl(const QUrl &url);
+    void screenRotated(bool landscape);
 
 private:
     void clean();
@@ -132,6 +137,8 @@ private:
     bool quiting;
 
     bool suspendDisabled;
+    RotateHelper *rotHelper;
+    bool autoRotateEnabled;
 };
 
 #endif // BROWSERAPPLICATION_H

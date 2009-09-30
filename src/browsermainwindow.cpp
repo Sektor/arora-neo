@@ -172,6 +172,14 @@ BrowserMainWindow::BrowserMainWindow(QWidget *parent, Qt::WindowFlags flags)
     hvl->addWidget(m_tabWidget->m_lineEdits);
     hvl->addWidget(m_toolbarSearch);
     m_toolbarSearch->setVisible(false); //
+    m_toggleToolbar = new QPushButton(this);
+    m_toggleToolbar->setFlat(true);
+    m_toggleToolbar->setText("Toolbar");
+    m_toggleToolbar->setFixedSize(100, 36);
+    m_toggleToolbar->setVisible(false);
+    connect(m_toggleToolbar, SIGNAL(clicked()),
+            this, SLOT(slotToggleToolbar()));
+    hvl->addWidget(m_toggleToolbar);
     layout->addLayout(hvl);
 
     layout->addWidget(m_navigationBar);
@@ -226,6 +234,8 @@ BrowserMainWindow::BrowserMainWindow(QWidget *parent, Qt::WindowFlags flags)
 #if defined(Q_WS_MAC)
     setWindowIcon(QIcon());
 #endif
+
+    setLandscapeMode( BrowserApplication::instance()->isLandscape() );
 }
 
 BrowserMainWindow::~BrowserMainWindow()
@@ -289,6 +299,7 @@ QByteArray BrowserMainWindow::saveState(bool withTabs) const
 
     stream << m_finger->isChecked();
     stream << m_mobile->isChecked();
+    stream << m_rotate->isChecked();
 
     return data;
 }
@@ -320,6 +331,7 @@ bool BrowserMainWindow::restoreState(const QByteArray &state)
     qint32 bookmarkBarLocation;
     bool fingerScrollingChecked;
     bool mobileUserAgentChecked;
+    bool autoRotateChecked;
 
     stream >> size;
     stream >> showToolbar;
@@ -334,12 +346,16 @@ bool BrowserMainWindow::restoreState(const QByteArray &state)
 
     stream >> fingerScrollingChecked;
     stream >> mobileUserAgentChecked;
+    stream >> autoRotateChecked;
 
     m_finger->setChecked(fingerScrollingChecked);
     slotFingerScrolling(fingerScrollingChecked);
 
     m_mobile->setChecked(mobileUserAgentChecked);
     slotMobileUserAgent(mobileUserAgentChecked);
+
+    m_rotate->setChecked(autoRotateChecked);
+    slotAutoRotate(autoRotateChecked);
 
     resize(size);
 
@@ -509,7 +525,9 @@ void BrowserMainWindow::setupMenu()
     viewMenu->addSeparator();
     viewMenu->addAction(tr("Page S&ource"), this, SLOT(slotViewPageSource()), tr("Ctrl+Alt+U"));
 
-    m_finger = viewMenu->addAction(tr("Finger scrolling"), this, SLOT(slotFingerScrolling(bool)));
+    viewMenu->addSeparator();
+
+    m_finger = viewMenu->addAction(tr("Finger Scrolling"), this, SLOT(slotFingerScrolling(bool)));
     m_finger->setCheckable(true);
     m_finger->setChecked(true);
     slotFingerScrolling(true);
@@ -519,9 +537,14 @@ void BrowserMainWindow::setupMenu()
     m_mobile->setChecked(false);
     slotMobileUserAgent(false);
 
+    m_rotate = viewMenu->addAction(tr("Screen Auto-Rotation"), this, SLOT(slotAutoRotate(bool)));
+    m_rotate->setCheckable(true);
+    m_rotate->setChecked(false);
+    slotAutoRotate(false);
+
     m_fullScreen = viewMenu->addAction(tr("&Full Screen"), this, SLOT(slotViewFullScreen(bool)),  Qt::Key_F11);
     m_fullScreen->setCheckable(true);
-    m_fullScreen->setIcon(style()->standardIcon(QStyle::SP_ArrowUp, 0, this));
+    m_fullScreen->setIcon(QIcon(QLatin1String(":fullscreen.png")));
     m_fullScreen->setIconVisibleInMenu(false);
 
     // History
@@ -639,15 +662,17 @@ void BrowserMainWindow::setupToolBar()
 
     m_navigationBar->addAction(m_tabWidget->newTabAction());
     m_navigationBar->addAction(m_tabWidget->closeTabAction());
+
+    m_zoomin = m_navigationBar->addAction(QIcon(":zoomin.png"), tr("Zoom In"), this, SLOT(slotViewTextBigger()));
+    m_zoomout = m_navigationBar->addAction(QIcon(":zoomout.png"), tr("Zoom Out"), this, SLOT(slotViewTextSmaller()));
+    m_zoomin->setVisible(false);
+    m_zoomout->setVisible(false);
+
     m_navigationBar->addAction(m_fullScreen);
 
     m_navigationBar->setFixedHeight(50);
     m_navigationBar->setIconSize(QSize(36,36));
-    for (int i=0; i<m_fullScreen->associatedWidgets().count(); i++)
-    {
-        if (QString(m_fullScreen->associatedWidgets()[i]->metaObject()->className()) == "QToolButton")
-            m_fullScreen->associatedWidgets()[i]->setMaximumWidth(55);
-    }
+    setToolbarButtonWidth(m_fullScreen, 55);
 
 //    m_navigationSplitter = new QSplitter(m_navigationBar);
 //    m_navigationSplitter->addWidget(m_tabWidget->lineEditStack());
@@ -664,6 +689,15 @@ void BrowserMainWindow::setupToolBar()
 //    QList<int> sizes;
 //    sizes << (int)((double)splitterWidth * .80) << (int)((double)splitterWidth * .20);
 //    m_navigationSplitter->setSizes(sizes);
+}
+
+void BrowserMainWindow::setToolbarButtonWidth(QAction *a, int w)
+{
+    for (int i=0; i<a->associatedWidgets().count(); i++)
+    {
+        if (QString(a->associatedWidgets()[i]->metaObject()->className()) == "QToolButton")
+            a->associatedWidgets()[i]->setMaximumWidth(w);
+    }
 }
 
 void BrowserMainWindow::slotShowBookmarksDialog()
@@ -1045,6 +1079,24 @@ void BrowserMainWindow::slotMobileUserAgent(bool en)
     tabWidget()->setGlobalMobileUserAgent(en);
 }
 
+void BrowserMainWindow::slotAutoRotate(bool en)
+{
+    BrowserApplication::instance()->setAutoRotate(en);
+}
+
+void BrowserMainWindow::setAutoRotateState(bool en)
+{
+    m_rotate->setChecked(en);
+}
+
+void BrowserMainWindow::setLandscapeMode(bool en)
+{
+    m_zoomin->setVisible(en);
+    m_zoomout->setVisible(en);
+    m_toggleToolbar->setVisible(en);
+    setToolbarButtonWidth(m_fullScreen, (en ? 48 : 55));
+}
+
 void BrowserMainWindow::slotViewFullScreen(bool makeFullScreen)
 {
     if (makeFullScreen) {
@@ -1052,6 +1104,13 @@ void BrowserMainWindow::slotViewFullScreen(bool makeFullScreen)
     } else {
         setWindowState(windowState() & ~Qt::WindowFullScreen);
     }
+}
+
+void BrowserMainWindow::slotToggleToolbar()
+{
+    bool vis = !m_navigationBar->isVisible();
+    m_navigationBar->setVisible(vis);
+    updateToolbarActionText(vis);
 }
 
 bool BrowserMainWindow::event(QEvent *event)
@@ -1089,8 +1148,12 @@ void BrowserMainWindow::slotHome()
 {
     QSettings settings;
     settings.beginGroup(QLatin1String("MainWindow"));
-    QString home = settings.value(QLatin1String("home"), QLatin1String("http://www.arora-browser.org")).toString();
-    loadPage(home);
+    int startup = settings.value(QLatin1String("startupBehavior"), 1).toInt(); //
+    if (startup == 0)
+    {
+        QString home = settings.value(QLatin1String("home"), QLatin1String("http://www.arora-browser.org")).toString();
+        loadPage(home);
+    }
 }
 
 void BrowserMainWindow::retranslate()

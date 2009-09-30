@@ -136,3 +136,11 @@ SOURCES += \
     utils/squeezelabel.cpp
 
 #-----------------------------------------------
+
+HEADERS += \
+    utils/rotate.h
+
+SOURCES += \
+    utils/rotate.cpp
+
+#-----------------------------------------------

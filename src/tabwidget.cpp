@@ -136,16 +136,16 @@ TabWidget::TabWidget(QWidget *parent)
 #if QT_VER_DEFINE < 0x040500
     QPixmap pm;
 
-    pm.load(":addtab.png");
-    pm = pm.scaled(36,36);
-    //m_newTabAction->setIcon(QIcon(QLatin1String(":addtab.png")));
-    m_newTabAction->setIcon(QIcon(pm));
+    //pm.load(":addtab.png");
+    //pm = pm.scaled(36,36);
+    //m_newTabAction->setIcon(QIcon(pm));
+    m_newTabAction->setIcon(QIcon(QLatin1String(":addtab.png")));
     m_newTabAction->setIconVisibleInMenu(false);
 
-    pm.load(":closetab.png");
-    pm = pm.scaled(36,36);
-    //m_closeTabAction->setIcon(QIcon(QLatin1String(":closetab.png")));
-    m_closeTabAction->setIcon(QIcon(pm));
+    //pm.load(":closetab.png");
+    //pm = pm.scaled(36,36);
+    //m_closeTabAction->setIcon(QIcon(pm));
+    m_closeTabAction->setIcon(QIcon(QLatin1String(":closetab.png")));
     m_closeTabAction->setIconVisibleInMenu(false);
 #endif
 

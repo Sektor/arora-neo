@@ -95,6 +95,8 @@ BrowserApplication::BrowserApplication(int &argc, char **argv)
     : SingleApplication(argc, argv)
     , quiting(false)
     , suspendDisabled(false)
+    , rotHelper(new RotateHelper(this))
+    , autoRotateEnabled(false)
 {
     QtopiaApplication::setOrganizationDomain(QLatin1String("arora-browser.org"));
     QtopiaApplication::setApplicationName(QLatin1String("Arora"));
@@ -139,6 +141,11 @@ BrowserApplication::BrowserApplication(int &argc, char **argv)
         languageManager()->setCurrentLanguage(settings.value(QLatin1String("language")).toString());
     settings.endGroup();
 
+    connect(rotHelper, SIGNAL(rotated(bool)), this, SLOT(screenRotated(bool)));
+
+    QtopiaApplication::setPowerConstraint(QtopiaApplication::DisableSuspend); //prevent suspending
+    suspendDisabled = true;
+
 #if defined(Q_WS_MAC)
     connect(this, SIGNAL(lastWindowClosed()),
             this, SLOT(lastWindowClosed()));
@@ -147,13 +154,13 @@ BrowserApplication::BrowserApplication(int &argc, char **argv)
 #ifndef AUTOTESTS
     QTimer::singleShot(0, this, SLOT(postLaunch()));
 #endif
-
-    QtopiaApplication::setPowerConstraint(QtopiaApplication::DisableSuspend); //prevent suspending
-    suspendDisabled = true;
 }
 
 BrowserApplication::~BrowserApplication()
 {
+    if (autoRotateEnabled)
+        rotHelper->restore();
+
     if (suspendDisabled)
         QtopiaApplication::setPowerConstraint(QtopiaApplication::Enable); //restore power saving settings
 
@@ -529,3 +536,32 @@ QString BrowserApplication::dataDirectory()
 #endif
 }
 
+void BrowserApplication::screenRotated(bool landscape)
+{
+    QList<BrowserMainWindow*> windows = mainWindows();
+    for (int i = 0; i < windows.count(); ++i)
+    {
+        windows.at(i)->setLandscapeMode(landscape);
+    }
+}
+
+void BrowserApplication::setAutoRotate(bool en)
+{
+    if (en)
+        rotHelper->start();
+    else
+        rotHelper->stop();
+
+    autoRotateEnabled = en;
+
+    QList<BrowserMainWindow*> windows = mainWindows();
+    for (int i = 0; i < windows.count(); ++i)
+    {
+        windows.at(i)->setAutoRotateState(en);
+    }
+}
+
+bool BrowserApplication::isLandscape()
+{
+    return rotHelper->isLandscape();
+}
