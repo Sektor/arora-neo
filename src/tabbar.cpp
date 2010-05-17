@@ -307,7 +307,7 @@ QSize TabBar::tabSizeHint(int index) const
     QSize sizeHint = QTabBar::tabSizeHint(index);
     QFontMetrics fm = fontMetrics();
     //return sizeHint.boundedTo(QSize(fm.width(QLatin1Char('M')) * 18, sizeHint.height()));
-    return sizeHint.boundedTo(QSize(fm.width(QLatin1Char('M')) * 18, 50));
+    return sizeHint.boundedTo(QSize(fm.width(QLatin1Char('M')) * 18, 35));
 }
 
 void TabBar::reloadTab()

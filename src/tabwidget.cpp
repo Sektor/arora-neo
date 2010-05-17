@@ -101,7 +101,7 @@ TabWidget::TabWidget(QWidget *parent)
     , globalFingerScrolling(true)
     , globalMobileUserAgent(false)
 {
-    m_tabBar->setFixedHeight(50); // + see tabSizeHint in tabbar.cpp
+    m_tabBar->setFixedHeight(35); // + see tabSizeHint in tabbar.cpp
     setElideMode(Qt::ElideRight);
 
     new QShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_T), this, SLOT(openLastTab()));
@@ -688,7 +688,7 @@ void TabWidget::webViewLoadStarted()
         //setTabIcon(index, icon);
 
         QPixmap pm(":loading.gif");
-        setTabIcon(index, QIcon(pm.scaled(36,36)));
+        setTabIcon(index, QIcon(pm.scaled(30,30)));
 #endif
     }
 }
@@ -730,8 +730,8 @@ void TabWidget::webViewIconChanged()
         //QIcon icon = BrowserApplication::instance()->icon(webView->url());
         //setTabIcon(index, icon);
 
-        QPixmap *pm = new QPixmap( BrowserApplication::instance()->icon(webView->url()).pixmap(16,16) );
-        setTabIcon(index, QIcon(pm->scaled(36,36)));
+        QPixmap *pm = new QPixmap( BrowserApplication::instance()->icon(webView->url()).pixmap(30,30) );
+        setTabIcon(index, QIcon(pm->scaled(30,30)));
         delete pm;
 #endif
     }

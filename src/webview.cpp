@@ -296,7 +296,8 @@ WebView::WebView(QWidget *parent)
     m_zoomLevels << 100;
     m_zoomLevels << 110 << 120 << 133 << 150 << 170 << 200 << 240 << 300;
 
-    setTextSizeMultiplier(qreal(m_currentZoom) / 100.0);
+    // setZoomFactor(qreal(m_currentZoom) / 100.0);
+    setZoomFactor(qreal(m_currentZoom) / 100.0);
 }
 /*
 void WebView::contextMenuEvent(QContextMenuEvent *event)
@@ -353,7 +354,7 @@ void WebView::wheelEvent(QWheelEvent *event)
     if (event->modifiers() & Qt::ControlModifier) {
         int numDegrees = event->delta() / 8;
         int numSteps = numDegrees / 15;
-        setTextSizeMultiplier(textSizeMultiplier() + numSteps * 0.1);
+        setZoomFactor(m_currentZoom + numSteps * 0.1);
         event->accept();
         return;
     }
@@ -441,7 +442,7 @@ void WebView::zoomIn()
     if (i < m_zoomLevels.count() - 1)
         m_currentZoom = m_zoomLevels[i + 1];
 
-    setTextSizeMultiplier(qreal(m_currentZoom) / 100.0);
+    setZoomFactor(qreal(m_currentZoom) / 100.0);
 }
 
 void WebView::zoomOut()
@@ -452,13 +453,13 @@ void WebView::zoomOut()
     if (i > 0)
         m_currentZoom = m_zoomLevels[i - 1];
 
-    setTextSizeMultiplier(qreal(m_currentZoom) / 100.0);
+    setZoomFactor(qreal(m_currentZoom) / 100.0);
 }
 
 void WebView::resetZoom()
 {
     m_currentZoom = 100;
-    setTextSizeMultiplier(1.0);
+    setZoomFactor(1.0);
 }
 
 void WebView::loadFinished()
