@@ -35,8 +35,8 @@ pics [
 
 #-----------------------------------------------
 
-INCLUDEPATH += \
-    utils
+INCLUDEPATH += utils \
+    $$path(.,project)/src/utils/
 
 RESOURCES += \
     data/data.qrc \
