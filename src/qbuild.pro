@@ -8,7 +8,7 @@ QT += webkit network
 DEFINES += QT_NO_UITOOLS
 DEFINES += GITVERSION=0
 DEFINES += GITCHANGENUMBER=0
-DEFINES += QT_VER_DEFINE=0
+DEFINES += QT_VER_DEFINE=263424
 #QT_VERSION
 
 #-----------------------------------------------

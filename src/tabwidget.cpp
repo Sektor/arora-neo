@@ -133,9 +133,7 @@ TabWidget::TabWidget(QWidget *parent)
     m_closeTabAction->setShortcuts(QKeySequence::Close);
     connect(m_closeTabAction, SIGNAL(triggered()), this, SLOT(closeTab()));
 
-#if QT_VER_DEFINE < 0x040500
-    QPixmap pm;
-
+    //QPixmap pm;
     //pm.load(":addtab.png");
     //pm = pm.scaled(36,36);
     //m_newTabAction->setIcon(QIcon(pm));
@@ -147,7 +145,6 @@ TabWidget::TabWidget(QWidget *parent)
     //m_closeTabAction->setIcon(QIcon(pm));
     m_closeTabAction->setIcon(QIcon(QLatin1String(":closetab.png")));
     m_closeTabAction->setIconVisibleInMenu(false);
-#endif
 
     m_nextTabAction = new QAction(tr("Show Next Tab"), this);
     QList<QKeySequence> shortcuts;
