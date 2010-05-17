@@ -296,7 +296,6 @@ WebView::WebView(QWidget *parent)
     m_zoomLevels << 100;
     m_zoomLevels << 110 << 120 << 133 << 150 << 170 << 200 << 240 << 300;
 
-    // setZoomFactor(qreal(m_currentZoom) / 100.0);
     setZoomFactor(qreal(m_currentZoom) / 100.0);
 }
 /*
