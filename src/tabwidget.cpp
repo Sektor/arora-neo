@@ -473,7 +473,7 @@ WebView *TabWidget::makeNewTab(bool makeCurrent)
         disconnect(this, SIGNAL(currentChanged(int)),
                    this, SLOT(currentChanged(int)));
 //        addTab(emptyWidget, tr("Untitled"));
-        addTab(emptyWidget,"");
+        addTab(emptyWidget,"t1");
         connect(this, SIGNAL(currentChanged(int)),
                 this, SLOT(currentChanged(int)));
         return 0;
@@ -509,8 +509,7 @@ WebView *TabWidget::makeNewTab(bool makeCurrent)
             this, SLOT(toolBarVisibilityChangeRequestedCheck(bool)));
 
     WebViewWithSearch *webViewWithSearch = new WebViewWithSearch(webView, this);
-//    addTab(webViewWithSearch, tr("Untitled"));
-    addTab(webViewWithSearch,"");
+    addTab(webViewWithSearch, tr("Untitled"));
     if (makeCurrent)
         setCurrentWidget(webViewWithSearch);
 
@@ -746,7 +745,7 @@ void TabWidget::webViewTitleChanged(const QString &title)
         if (title.isEmpty())
             tabTitle = webView->url().toString();
         tabTitle.replace(QLatin1Char('&'), QLatin1String("&&"));
-//        setTabText(index, tabTitle);
+        setTabText(index, tabTitle);
     }
     if (currentIndex() == index)
         emit setCurrentTitle(title);
