@@ -240,7 +240,7 @@ void BrowserApplication::postLaunch()
         directory = QDir::homePath() + QLatin1String("/.") + QtopiaApplication::applicationName();
     QWebSettings::setIconDatabasePath(directory);
 
-    setWindowIcon(QIcon(QLatin1String(":128x128/arora.png")));
+    // setWindowIcon(QIcon(QLatin1String(":128x128/arora.png")));
 
     loadSettings();
 
