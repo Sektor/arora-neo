@@ -84,6 +84,7 @@
 #include <qtoolbutton.h>
 
 #include <QPalette>
+#include <QProcess>
 
 #include <qdebug.h>
 
@@ -756,10 +757,60 @@ void TabWidget::webViewUrlChanged(const QUrl &url)
 {
     WebView *webView = qobject_cast<WebView*>(sender());
     int index = webViewIndex(webView);
-    if (-1 != index) {
+    if (-1 != index)
+    {
+        QString cururl = webView->url().toString();
+        QString newurl = url.toString();
+        QString vid = "";
+        if ((newurl.indexOf("rtsp://")>=0) && (newurl.indexOf("youtube.com")>=0))
+        {
+            if ((cururl.indexOf("http://")>=0) && (cururl.indexOf("youtube.com")>=0))
+            {
+                QString vs;
+                QString vs1 = "?v=";
+                QString vs2 = "&v=";
+                vs = vs1;
+                int v_i = cururl.indexOf(vs);
+                if (v_i<0)
+                {
+                    vs = vs2;
+                    v_i = cururl.indexOf(vs);
+                }
+                if (v_i>=0)
+                {
+                    vid = cururl.mid(v_i + vs.length());
+                    int a_i = vid.indexOf("&");
+                    if (a_i>=0)
+                        vid = vid.left(a_i);
+                }
+            }
+        }
+
+        if (vid != "")
+            startPlayer("http://www.youtube.com/watch?v=" + vid);
+
         m_tabBar->setTabData(index, url);
     }
     emit tabsChanged();
+}
+
+void TabWidget::startPlayer(QString vid_url)
+{
+    if (vid_url.isNull())
+    {
+        WebView *curwebview = this->currentWebView();
+        if (curwebview)
+            vid_url = curwebview->url().toString();
+        else
+            return;
+    }
+    QProcess *qmproc = new QProcess(this);
+    qmproc->start("qmplayer --mpargs \"-vo fbdev -framedrop\" --youtube-dl \"" + vid_url + "\"");
+    if(!qmproc->waitForStarted())
+    {
+       delete(qmproc);
+       QMessageBox::warning(this, "Arora", tr("Failed to open QMPlayer"));
+    }
 }
 
 void TabWidget::openLastTab()

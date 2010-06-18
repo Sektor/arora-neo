@@ -128,6 +128,7 @@ private slots:
     void slotFilePrintPreview();
     void slotFilePrint();
     void slotPrivateBrowsing();
+    void slotWatchFlashVideo();
     void slotFileSaveAs();
     void slotEditFind();
     void slotEditFindNext();

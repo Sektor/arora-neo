@@ -424,6 +424,7 @@ void BrowserMainWindow::setupMenu()
     fileMenu->addSeparator();
     m_privateBrowsing = fileMenu->addAction(tr("Private &Browsing..."), this, SLOT(slotPrivateBrowsing()));
     m_privateBrowsing->setCheckable(true);
+    fileMenu->addAction(tr("Watch Flash Video"), this, SLOT(slotWatchFlashVideo()));
     fileMenu->addSeparator();
 
 #if defined(Q_WS_MAC)
@@ -1328,3 +1329,7 @@ void BrowserMainWindow::geometryChangeRequested(const QRect &geometry)
     setGeometry(geometry);
 }
 
+void BrowserMainWindow::slotWatchFlashVideo()
+{
+    m_tabWidget->startPlayer();
+}
