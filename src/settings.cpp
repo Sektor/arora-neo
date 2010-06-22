@@ -78,6 +78,7 @@
 #include <QSoftMenuBar>
 #include <QMenu>
 #include <QDir>
+#include <QProcess>
 
 SettingsDialog::SettingsDialog(QWidget *parent)
     : QDialog(parent)
@@ -88,6 +89,12 @@ SettingsDialog::SettingsDialog(QWidget *parent)
     connect(cookiesButton, SIGNAL(clicked()), this, SLOT(showCookies()));
     connect(standardFontButton, SIGNAL(clicked()), this, SLOT(chooseFont()));
     connect(fixedFontButton, SIGNAL(clicked()), this, SLOT(chooseFixedFont()));
+
+    connect(fbdev_chb, SIGNAL(stateChanged(int)), this, SLOT(refreshMplayerArgs()));
+    connect(framedrop_chb, SIGNAL(stateChanged(int)), this, SLOT(refreshMplayerArgs()));
+    connect(center_chb, SIGNAL(stateChanged(int)), this, SLOT(refreshMplayerArgs()));
+    connect(rotate_chb, SIGNAL(stateChanged(int)), this, SLOT(refreshMplayerArgs()));
+    connect(mptest_btn, SIGNAL(clicked()), this, SLOT(mptestClicked()));
 
     loadDefaults();
     loadFromSettings();
@@ -127,6 +134,45 @@ void SettingsDialog::loadDefaults()
     enableJavascript->setChecked(defaultSettings->testAttribute(QWebSettings::JavascriptEnabled));
     enablePlugins->setChecked(defaultSettings->testAttribute(QWebSettings::PluginsEnabled));
     enableImages->setChecked(defaultSettings->testAttribute(QWebSettings::AutoLoadImages));
+
+    fbdev_chb->setChecked(true);
+    framedrop_chb->setChecked(true);
+    center_chb->setChecked(true);
+    rotate_chb->setChecked(false);
+    refreshMplayerArgs();
+    mpargs2_edt->setText("");
+    ytargs_edt->setText("");
+}
+
+void SettingsDialog::mptestClicked()
+{
+    QString mpargs = (mpargs1_edt->text() + " " + mpargs2_edt->text().trimmed()).trimmed();
+    if (!mpargs.isEmpty())
+        mpargs = " --mpargs \"" + mpargs + "\"";
+
+    QProcess *qmproc = new QProcess(this);
+    qmproc->start("qmplayer" + mpargs);
+    if(!qmproc->waitForStarted())
+    {
+        delete(qmproc);
+        QMessageBox::warning(this, "Arora", tr("Failed to run QMPlayer"));
+    }
+}
+
+QString SettingsDialog::composeMplayerArgs(bool fbdev, bool framedrop, bool center, bool rotate)
+{
+    QString res = QString(fbdev ? "-vo fbdev ":"") +
+            QString(framedrop ? "-framedrop ":"") +
+            QString(center ? "-geometry 50%:40% ":"") +
+            QString(rotate ? "-vf rotate=2 ":"");
+    return res.trimmed();
+}
+
+void SettingsDialog::refreshMplayerArgs()
+{
+    mpargs1_edt->setText(composeMplayerArgs(
+            fbdev_chb->isChecked(), framedrop_chb->isChecked(),
+            center_chb->isChecked(), rotate_chb->isChecked()));
 }
 
 void SettingsDialog::loadFromSettings()
@@ -238,6 +284,17 @@ void SettingsDialog::loadFromSettings()
     selectTabsWhenCreated->setChecked(settings.value(QLatin1String("selectNewTabs"), false).toBool());
     confirmClosingMultipleTabs->setChecked(settings.value(QLatin1String("confirmClosingMultipleTabs"), true).toBool());
     settings.endGroup();
+
+    // Video
+    settings.beginGroup(QLatin1String("video"));
+    fbdev_chb->setChecked(settings.value(QLatin1String("fbdev"), true).toBool());
+    framedrop_chb->setChecked(settings.value(QLatin1String("framedrop"), true).toBool());
+    center_chb->setChecked(settings.value(QLatin1String("center"), true).toBool());
+    rotate_chb->setChecked(settings.value(QLatin1String("rotate"), false).toBool());
+    refreshMplayerArgs();
+    mpargs2_edt->setText(settings.value(QLatin1String("mpargs2")).toString());
+    ytargs_edt->setText(settings.value(QLatin1String("ytargs")).toString());
+    settings.endGroup();
 }
 
 void SettingsDialog::saveToSettings()
@@ -339,6 +396,16 @@ void SettingsDialog::saveToSettings()
     settings.beginGroup(QLatin1String("tabs"));
     settings.setValue(QLatin1String("selectNewTabs"), selectTabsWhenCreated->isChecked());
     settings.setValue(QLatin1String("confirmClosingMultipleTabs"), confirmClosingMultipleTabs->isChecked());
+    settings.endGroup();
+
+    // Video
+    settings.beginGroup(QLatin1String("video"));
+    settings.setValue(QLatin1String("fbdev"), fbdev_chb->isChecked());
+    settings.setValue(QLatin1String("framedrop"), framedrop_chb->isChecked());
+    settings.setValue(QLatin1String("center"), center_chb->isChecked());
+    settings.setValue(QLatin1String("rotate"), rotate_chb->isChecked());
+    settings.setValue(QLatin1String("mpargs2"), mpargs2_edt->text());
+    settings.setValue(QLatin1String("ytargs"), ytargs_edt->text());
     settings.endGroup();
 
     BrowserApplication::instance()->loadSettings();

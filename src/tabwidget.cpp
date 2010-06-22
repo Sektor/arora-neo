@@ -71,6 +71,7 @@
 #include "webactionmapper.h"
 #include "webview.h"
 #include "webviewsearch.h"
+#include "settings.h"
 
 #include <qcompleter.h>
 #include <qevent.h>
@@ -804,12 +805,31 @@ void TabWidget::startPlayer(QString vid_url)
         else
             return;
     }
+
+    QSettings settings;
+    settings.beginGroup(QLatin1String("video"));
+    bool fbdev = settings.value(QLatin1String("fbdev"), true).toBool();
+    bool framedrop = settings.value(QLatin1String("framedrop"), true).toBool();
+    bool center = settings.value(QLatin1String("center"), true).toBool();
+    bool rotate = settings.value(QLatin1String("rotate"), false).toBool();
+    QString mpargs1 = SettingsDialog::composeMplayerArgs(fbdev, framedrop, center, rotate);
+    QString mpargs2 = settings.value(QLatin1String("mpargs2")).toString();
+    QString ytargs = settings.value(QLatin1String("ytargs")).toString();
+
+    QString mpargs = (mpargs1 + " " + mpargs2.trimmed()).trimmed();
+    if (!mpargs.isEmpty())
+        mpargs = "--mpargs \"" + mpargs + "\" ";
+
+    ytargs = ytargs.trimmed();
+    if (!ytargs.isEmpty())
+        ytargs += " ";
+
     QProcess *qmproc = new QProcess(this);
-    qmproc->start("qmplayer --mpargs \"-vo fbdev -framedrop\" --youtube-dl \"" + vid_url + "\"");
+    qmproc->start("qmplayer " + mpargs + "--youtube-dl \"" + ytargs + vid_url + "\"");
     if(!qmproc->waitForStarted())
     {
-       delete(qmproc);
-       QMessageBox::warning(this, "Arora", tr("Failed to open QMPlayer"));
+        delete(qmproc);
+        QMessageBox::warning(this, "Arora", tr("Failed to run QMPlayer"));
     }
 }
 

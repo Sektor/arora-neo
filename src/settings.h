@@ -73,12 +73,15 @@ class SettingsDialog : public QDialog, public Ui_Settings
 public:
     SettingsDialog(QWidget *parent = 0);
     void accept();
+    static QString composeMplayerArgs(bool fbdev, bool framedrop, bool center, bool rotate);
 
 private slots:
     void loadDefaults();
     void loadFromSettings();
     void saveToSettings();
 
+    void mptestClicked();
+    void refreshMplayerArgs();
     void setHomeToCurrentPage();
     void showCookies();
     void showExceptions();
