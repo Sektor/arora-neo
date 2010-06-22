@@ -79,6 +79,7 @@
 #include <QMenu>
 #include <QDir>
 #include <QProcess>
+#include <QCoreApplication>
 
 SettingsDialog::SettingsDialog(QWidget *parent)
     : QDialog(parent)
@@ -135,6 +136,8 @@ void SettingsDialog::loadDefaults()
     enablePlugins->setChecked(defaultSettings->testAttribute(QWebSettings::PluginsEnabled));
     enableImages->setChecked(defaultSettings->testAttribute(QWebSettings::AutoLoadImages));
 
+    userStyleSheet->setText(defaultStyleSheet().toString());
+
     fbdev_chb->setChecked(true);
     framedrop_chb->setChecked(true);
     center_chb->setChecked(true);
@@ -157,6 +160,11 @@ void SettingsDialog::mptestClicked()
         delete(qmproc);
         QMessageBox::warning(this, "Arora", tr("Failed to run QMPlayer"));
     }
+}
+
+QUrl SettingsDialog::defaultStyleSheet()
+{
+    return QUrl::fromLocalFile(QCoreApplication::applicationDirPath() + "/../etc/arora/stylesheet.css");
 }
 
 QString SettingsDialog::composeMplayerArgs(bool fbdev, bool framedrop, bool center, bool rotate)
@@ -226,7 +234,7 @@ void SettingsDialog::loadFromSettings()
     enableJavascript->setChecked(settings.value(QLatin1String("enableJavascript"), enableJavascript->isChecked()).toBool());
     enablePlugins->setChecked(settings.value(QLatin1String("enablePlugins"), enablePlugins->isChecked()).toBool());
     enableImages->setChecked(settings.value(QLatin1String("enableImages"), enableImages->isChecked()).toBool());
-    userStyleSheet->setText(settings.value(QLatin1String("userStyleSheet")).toUrl().toString());
+    userStyleSheet->setText(settings.value(QLatin1String("userStyleSheet"), defaultStyleSheet()).toUrl().toString());
     settings.endGroup();
 
     // Privacy

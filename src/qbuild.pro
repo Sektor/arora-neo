@@ -33,6 +33,12 @@ pics [
     path=/pics/arora
 ]
 
+config [
+    hint=image
+    files=data/stylesheet.css
+    path=/etc/arora
+]
+
 #-----------------------------------------------
 
 INCLUDEPATH += utils \

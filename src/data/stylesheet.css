@@ -1,0 +1,30 @@
+/* fix for the forms, to disable qtopia look and feel of the HTML form elements */
+
+input:not([type]), input[type='text'], input[type='password'], TEXTAREA
+{
+    color: black;
+    border:1px solid #d0d0d0;
+    -webkit-border-radius: 3px;
+}
+
+input:not([type]):FOCUS, input[type='text']:FOCUS, input[type='password']:FOCUS, TEXTAREA:FOCUS
+{
+    color: black;
+    border:1px solid #000;
+}
+
+SELECT
+{
+    color: black; /* doesnt work at all */
+    background-color:gray; 
+    border:1px solid #d0d0d0;
+    -webkit-border-radius: 3px;
+}
+
+OPTION
+{
+    color: black;
+    border:1px solid #d0d0d0;
+    -webkit-border-radius: 3px;
+}
+

@@ -71,6 +71,7 @@
 #include "networkaccessmanager.h"
 #include "tabwidget.h"
 #include "webview.h"
+#include "settings.h"
 
 #include <qbuffer.h>
 #include <qdesktopservices.h>
@@ -307,7 +308,7 @@ void BrowserApplication::loadSettings()
     defaultSettings->setAttribute(QWebSettings::AutoLoadImages, settings.value(QLatin1String("enableImages"), true).toBool());
     defaultSettings->setAttribute(QWebSettings::DeveloperExtrasEnabled, settings.value(QLatin1String("enableInspector"), false).toBool());
 
-    QUrl url = settings.value(QLatin1String("userStyleSheet")).toUrl();
+    QUrl url = settings.value(QLatin1String("userStyleSheet"), SettingsDialog::defaultStyleSheet()).toUrl();
     defaultSettings->setUserStyleSheetUrl(url);
 
     settings.endGroup();

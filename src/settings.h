@@ -74,6 +74,7 @@ public:
     SettingsDialog(QWidget *parent = 0);
     void accept();
     static QString composeMplayerArgs(bool fbdev, bool framedrop, bool center, bool rotate);
+    static QUrl defaultStyleSheet();
 
 private slots:
     void loadDefaults();
